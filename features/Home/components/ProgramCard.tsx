@@ -93,9 +93,10 @@ export const ProgramCard: React.FC<{
             label="Edit"
             onPress={() => {
               setMenuOpen(false);
-              onEdit?.();
+              setTimeout(onEdit!, 0);
             }}
           />
+
           <MenuItem
             label="Delete"
             destructive

@@ -3,9 +3,11 @@ import { PhaseSwitcher } from "@/features/ProgramEditor/components";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useProgramStore } from "@/stores/programStore";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
+  Image,
   ImageBackground,
   Pressable,
   ScrollView,
@@ -82,10 +84,10 @@ export default function ProgramDetails() {
                 ? { uri: program.imageUrl }
                 : require("@/assets/images/program-placeholder.webp")
             }
-            style={{ width: "100%", height: 240, justifyContent: "flex-start" }}
+            style={{ width: "100%", height: 260, justifyContent: "flex-start" }}
             resizeMode="cover"
           >
-            {/* Dim the entire image */}
+            {/* Dim layer for overall fade */}
             <View
               style={{
                 ...StyleSheet.absoluteFillObject,
@@ -93,7 +95,7 @@ export default function ProgramDetails() {
               }}
             />
 
-            {/* Top bar: back, title, subtext, menu */}
+            {/* Top bar: back, title, goal/duration, menu */}
             <View style={{ paddingTop: 12, paddingHorizontal: 16 }}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Pressable
@@ -126,7 +128,6 @@ export default function ProgramDetails() {
                   </Text>
                 </View>
 
-                {/* 3-dots */}
                 <Pressable
                   onPress={() => setMenuOpen((v) => !v)}
                   style={{ padding: 8, borderRadius: 999 }}
@@ -136,29 +137,32 @@ export default function ProgramDetails() {
               </View>
             </View>
 
-            {/* Bottom description area with fade to transparent upwards */}
-            <View style={{ flex: 1, justifyContent: "flex-end" }}>
-              <View
+            {/* Bottom description with gradient fade */}
+            <LinearGradient
+              colors={["transparent", "rgba(0,0,0,0.7)"]}
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                paddingHorizontal: 16,
+                paddingVertical: 16,
+              }}
+            >
+              <Text
                 style={{
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
-                  backgroundColor: "rgba(0,0,0,0.25)",
+                  color: "rgba(255,255,255,0.95)",
+                  fontFamily: "WorkSans_400Regular",
+                  fontSize: 14,
                 }}
+                numberOfLines={3}
               >
-                <Text
-                  style={{
-                    color: "rgba(255,255,255,0.95)",
-                    fontFamily: "WorkSans_400Regular",
-                  }}
-                  numberOfLines={3}
-                >
-                  {program.description || "No program description yet."}
-                </Text>
-              </View>
-            </View>
+                {program.description || "No program description yet."}
+              </Text>
+            </LinearGradient>
           </ImageBackground>
 
-          {/* actions sheet */}
+          {/* Actions menu */}
           {menuOpen ? (
             <View
               style={{
@@ -175,8 +179,8 @@ export default function ProgramDetails() {
               <MenuItem
                 label="Edit program"
                 onPress={() => {
+                  goEditDay(phase.days[0].id);
                   setMenuOpen(false);
-                  router.push(`/programs/${program.id}/edit`);
                 }}
               />
               <MenuItem
@@ -229,51 +233,68 @@ export default function ProgramDetails() {
                   key={d.id}
                   onPress={() => goDayView(d.id)}
                   style={{
-                    backgroundColor: surface,
                     borderWidth: 1,
                     borderColor: outline,
+                    backgroundColor: surface,
                     borderRadius: 12,
-                    padding: 12,
+                    padding: 10,
+                    marginBottom: 10,
                   }}
                 >
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 10,
+                    }}
+                  >
+                    {/* Left: title + meta */}
                     <View style={{ flex: 1 }}>
-                      <Text
-                        style={{
-                          color: text,
-                          fontFamily: "Syne_700Bold",
-                          fontSize: 16,
-                        }}
-                      >
-                        {d.title}{" "}
-                        <Text
+                      <P style={{ fontFamily: "WorkSans_600SemiBold" }}>
+                        {d.type === "workout"
+                          ? d.title || "Workout day"
+                          : "Rest day"}
+                      </P>
+                      <P color="muted" style={{ fontSize: 12 }}>
+                        {d.type}
+                        {d.type === "workout" ? ` • ${d.durationMin}m` : ""}
+                      </P>
+                    </View>
+
+                    {/* Right: image thumbnail */}
+                    <View
+                      style={{
+                        width: 64,
+                        height: 48,
+                        borderRadius: 8,
+                        overflow: "hidden",
+                        borderWidth: 1,
+                        borderColor: outline,
+                        backgroundColor: surface,
+                      }}
+                    >
+                      {d.type === "workout" && (d as any).imageUrl ? (
+                        <Image
+                          source={{ uri: (d as any).imageUrl }}
+                          style={{ width: "100%", height: "100%" }}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View
                           style={{
-                            color: muted,
-                            fontFamily: "WorkSans_400Regular",
+                            flex: 1,
+                            alignItems: "center",
+                            justifyContent: "center",
                           }}
                         >
-                          • {d.type}
-                        </Text>
-                      </Text>
-                      {d.type === "workout" ? (
-                        <Text style={{ color: muted, marginTop: 2 }}>
-                          {d.durationMin} min • {d.numberOfExercises} exercises
-                          • {d.numberOfSets} sets
-                        </Text>
-                      ) : null}
+                          <Ionicons
+                            name="image-outline"
+                            size={18}
+                            color={muted}
+                          />
+                        </View>
+                      )}
                     </View>
-                    <Pressable
-                      onPress={() => goEditDay(d.id)}
-                      style={{ padding: 6, marginLeft: 6 }}
-                    >
-                      <Ionicons name="create-outline" size={18} color={text} />
-                    </Pressable>
-                    <Pressable
-                      onPress={() => deleteDay(d.id)}
-                      style={{ padding: 6 }}
-                    >
-                      <Ionicons name="trash-outline" size={18} color={text} />
-                    </Pressable>
                   </View>
                 </Pressable>
               ))

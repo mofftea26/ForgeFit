@@ -1,6 +1,7 @@
+import { useThemeColor } from "@/hooks/use-theme-color";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "@/components/ui/Button";
@@ -20,7 +21,6 @@ import {
   RestDayEditor,
   WorkoutDayEditor,
 } from "@/features/ProgramEditor/components";
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { useProgramStore } from "@/stores/programStore";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -33,6 +33,7 @@ export default function ProgramEditorScreen() {
   const bg = useThemeColor({}, "background");
   const outline = useThemeColor({}, "outline");
   const text = useThemeColor({}, "text");
+  const primary = useThemeColor({}, "primary");
   const router = useRouter();
 
   const program = useProgramStore((s) => s.programs.find((p) => p.id === id));
@@ -143,15 +144,35 @@ export default function ProgramEditorScreen() {
         </View>
         <View style={{ height: 1, backgroundColor: outline, opacity: 0.6 }} />
 
-        <PhaseBar
-          phases={program.phases}
-          activeIndex={phaseIdx}
-          onChange={(i) => {
-            setPhaseIdx(i);
-            setSelectedDayId(program.phases[i].days[0]?.id);
-          }}
-          onAddPhase={addPhase}
-        />
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <View style={{ flex: 1 }}>
+            <PhaseBar
+              phases={program.phases}
+              activeIndex={phaseIdx}
+              onChange={(i) => {
+                setPhaseIdx(i);
+                setSelectedDayId(program.phases[i].days[0]?.id);
+              }}
+            />
+          </View>
+
+          {/* Round + outside the container */}
+          <Pressable
+            onPress={addPhase}
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: primary,
+            }}
+          >
+            <Text style={{ color: "#fff", fontSize: 22, marginTop: -2 }}>
+              +
+            </Text>
+          </Pressable>
+        </View>
 
         {/* Days */}
         <DayList
@@ -179,15 +200,24 @@ export default function ProgramEditorScreen() {
         )}
 
         <View style={{ height: 8 }} />
-        <Button title="Back" variant="ghost" onPress={() => router.back()} />
-        <Button
-          title="Delete program"
-          variant="warning"
-          onPress={() => {
-            removeProgram(program.id);
-            router.replace("/");
-          }}
-        />
+        <View style={{ flexDirection: "row", gap: 10, paddingBottom: 12 }}>
+          <View style={{ flex: 1 }}>
+            <Button
+              title="Back"
+              variant="ghost"
+              onPress={() => router.back()}
+              fullWidth
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button
+              title="Save"
+              variant="primary"
+              onPress={() => router.back()}
+              fullWidth
+            />
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

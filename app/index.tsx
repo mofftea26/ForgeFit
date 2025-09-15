@@ -57,7 +57,8 @@ export default function Home() {
               <ProgramCard
                 key={p.id}
                 program={p}
-                onPress={() => router.push(`/programs/${p.id}` as any)}
+                onPress={() => router.push(`/programs/${p.id}`)}
+                onEdit={() => router.push(`/programs/${p.id}/edit`)}
                 onDelete={() => removeProgram(p.id)}
               />
             ))

@@ -2,7 +2,7 @@ import { Day } from "@/entities/program/zod";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 
 export const DayList: React.FC<{
   days: Day[];
@@ -17,19 +17,20 @@ export const DayList: React.FC<{
   const tint = useThemeColor({}, "primarySoft");
   const text = useThemeColor({}, "text");
   const muted = useThemeColor({}, "muted");
-  const danger = useThemeColor({}, "accentAlt");
 
   return (
-    <View style={{ gap: 8 }}>
-      <View style={{ flexDirection: "row", gap: 8 }}>
+    <View style={{ gap: 10 }}>
+      {/* same line add buttons */}
+      <View style={{ flexDirection: "row", gap: 10 }}>
         <Pressable
           onPress={onAddWorkout}
           style={{
+            flex: 1,
             borderWidth: 1,
             borderColor: outline,
-            paddingVertical: 8,
-            paddingHorizontal: 10,
-            borderRadius: 10,
+            borderRadius: 12,
+            padding: 12,
+            alignItems: "center",
           }}
         >
           <Text style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
@@ -39,11 +40,12 @@ export const DayList: React.FC<{
         <Pressable
           onPress={onAddRest}
           style={{
+            flex: 1,
             borderWidth: 1,
             borderColor: outline,
-            paddingVertical: 8,
-            paddingHorizontal: 10,
-            borderRadius: 10,
+            borderRadius: 12,
+            padding: 12,
+            alignItems: "center",
           }}
         >
           <Text style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
@@ -52,50 +54,65 @@ export const DayList: React.FC<{
         </Pressable>
       </View>
 
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+      {/* Horizontal day cards, compact height, trash on far right */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 10, paddingVertical: 2 }}
+      >
         {days.map((d, idx) => {
           const active = d.id === selectedId;
           return (
-            <View
+            <Pressable
               key={d.id}
+              onPress={() => onSelect(d.id)}
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 6,
+                width: 220,
                 borderWidth: 1,
                 borderColor: outline,
                 backgroundColor: active ? tint : surface,
+                borderRadius: 12,
                 paddingVertical: 8,
                 paddingHorizontal: 10,
-                borderRadius: 10,
               }}
             >
-              <Pressable
-                onPress={() => onSelect(d.id)}
-                style={{ maxWidth: 180 }}
-              >
-                <Text
-                  style={{
-                    color: active ? "#fff" : text,
-                    fontFamily: "WorkSans_600SemiBold",
-                  }}
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      color: active ? "#fff" : text,
+                      fontFamily: "WorkSans_600SemiBold",
+                    }}
+                    numberOfLines={1}
+                  >
+                    {d.type === "workout"
+                      ? d.title || `Day ${idx + 1}`
+                      : "Rest"}
+                  </Text>
+                  <Text
+                    style={{ color: active ? "#fff" : muted, fontSize: 12 }}
+                    numberOfLines={1}
+                  >
+                    {d.type}
+                    {d.type === "workout" ? ` • ${d.durationMin}m` : ""}
+                  </Text>
+                </View>
+                <Pressable
+                  onPress={() => onRemoveDay(d.id)}
+                  hitSlop={8}
+                  style={{ padding: 4, marginLeft: 6 }}
                 >
-                  {d.type === "workout" ? d.title || `Day ${idx + 1}` : "Rest"}
-                </Text>
-                <Text style={{ color: active ? "#fff" : muted, fontSize: 12 }}>
-                  {d.type}
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={() => onRemoveDay(d.id)}
-                style={{ padding: 4 }}
-              >
-                <Ionicons name="trash-outline" size={16} color={danger} />
-              </Pressable>
-            </View>
+                  <Ionicons
+                    name="trash-outline"
+                    size={16}
+                    color={active ? "#fff" : text}
+                  />
+                </Pressable>
+              </View>
+            </Pressable>
           );
         })}
-      </View>
+      </ScrollView>
     </View>
   );
 };

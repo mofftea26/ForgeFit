@@ -120,17 +120,17 @@ export const phaseSchema = z
   });
 
 /** ----------- Program ----------- */
-export const programSchema = z.object({
-  id: z.string().default(id()),
-  title: z.string().min(1, "Program title is required"),
+export const ProgramSchema = z.object({
+  id: z.string(),
+  title: z.string(),
   description: z.string().optional().default(""),
-  goal: goalEnum,
-  lengthWeeks: z.number().int().positive().max(104), // up to 2 years
-  phases: z.array(phaseSchema).min(1, "Program needs at least 1 phase"),
-  // metadata for exports/sharing
-  version: z.string().default("1.0.0"),
-  createdAt: z.number().default(() => Date.now()),
-  updatedAt: z.number().default(() => Date.now()),
+  goal: z.enum(["cut", "bulk", "recomp", "strength", "endurance"]),
+  lengthWeeks: z.number().int().min(1),
+  phases: z.array(phaseSchema),
+  imageUrl: z.string().url().optional().or(z.literal("")).optional(), // ⬅ add this
+  version: z.string(),
+  createdAt: z.number(),
+  updatedAt: z.number(),
 });
 
 /** ----------- Inferred Types ----------- */
@@ -140,7 +140,7 @@ export type WorkoutDay = z.infer<typeof workoutDaySchema>;
 export type RestDay = z.infer<typeof restDaySchema>;
 export type Day = z.infer<typeof daySchema>;
 export type Phase = z.infer<typeof phaseSchema>;
-export type Program = z.infer<typeof programSchema>;
+export type Program = z.infer<typeof ProgramSchema>;
 
 /** ----------- Blank factories (good UX defaults) ----------- */
 export const blankExercise = (title = ""): Exercise => ({

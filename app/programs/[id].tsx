@@ -1,12 +1,18 @@
-import { Button } from "@/components/ui/Button";
-import { H1, H2, P } from "@/components/ui/Typography";
+import { H2, P } from "@/components/ui/Typography";
 import { PhaseSwitcher } from "@/features/ProgramEditor/components";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useProgramStore } from "@/stores/programStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import {
+  ImageBackground,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProgramDetails() {
@@ -16,7 +22,6 @@ export default function ProgramDetails() {
   const muted = useThemeColor({}, "muted");
   const surface = useThemeColor({}, "surface");
   const outline = useThemeColor({}, "outline");
-  const primary = useThemeColor({}, "primary");
   const router = useRouter();
 
   const program = useProgramStore((s) => s.programs.find((p) => p.id === id));
@@ -24,6 +29,7 @@ export default function ProgramDetails() {
   const removeProgram = useProgramStore((s) => s.removeProgram);
 
   const [phaseIdx, setPhaseIdx] = React.useState(0);
+  const [menuOpen, setMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (!program) return;
@@ -56,134 +62,249 @@ export default function ProgramDetails() {
     update(program.id, { phases });
   };
 
-  const goDayView = (dayId: string) => {
+  const goDayView = (dayId: string) =>
     router.push(`/programs/${program.id}/days/${dayId}`);
-  };
-
-  const goEditDay = (dayId: string) => {
-    // deep-link to editor with phase & day preselected
+  const goEditDay = (dayId: string) =>
     router.push({
-      pathname: `/programs/${program.id}/edit`,
+      pathname: `/programs/${program.id}/edit` as any,
       params: { phase: String(phaseIdx), day: dayId },
-    } as any);
-  };
+    });
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bg }}>
-      <ScrollView
-        contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }}
-      >
-        {/* top row: back + titles */}
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-          <Pressable
-            onPress={() => router.back()}
-            style={{ padding: 8, borderRadius: 999 }}
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+        {/* Header with image background */}
+        {/* Header with image background (dimmed), top info, bottom description */}
+        <View style={{ marginBottom: 12 }}>
+          <ImageBackground
+            source={
+              program.imageUrl
+                ? { uri: program.imageUrl }
+                : require("@/assets/images/program-placeholder.webp")
+            }
+            style={{ width: "100%", height: 240, justifyContent: "flex-start" }}
+            resizeMode="cover"
           >
-            <Ionicons name="chevron-back" size={22} color={text} />
-          </Pressable>
-          <View style={{ flex: 1 }}>
-            <H1>{program.title}</H1>
-            <P color="muted">
-              Goal: {program.goal} • Length: {program.lengthWeeks} weeks •
-              Phases: {program.phases.length}
-            </P>
-          </View>
-        </View>
+            {/* Dim the entire image */}
+            <View
+              style={{
+                ...StyleSheet.absoluteFillObject,
+                backgroundColor: "rgba(0,0,0,0.35)",
+              }}
+            />
 
-        {/* program description */}
-        <P>{program.description || "No program description yet."}</P>
+            {/* Top bar: back, title, subtext, menu */}
+            <View style={{ paddingTop: 12, paddingHorizontal: 16 }}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Pressable
+                  onPress={() => router.back()}
+                  style={{ padding: 8, borderRadius: 999, marginRight: 6 }}
+                >
+                  <Ionicons name="chevron-back" size={22} color="#fff" />
+                </Pressable>
 
-        {/* actions */}
-        <View style={{ flexDirection: "row", gap: 10 }}>
-          <Button
-            title="Edit program"
-            variant="secondary"
-            onPress={() => router.push(`/programs/${program.id}/edit`)}
-          />
-          <Button title="Export (soon)" variant="subtle" onPress={() => {}} />
-          <Button
-            title="Delete program"
-            variant="warning"
-            onPress={() => {
-              removeProgram(program.id);
-              router.replace("/");
-            }}
-          />
-        </View>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      color: "#fff",
+                      fontFamily: "Syne_700Bold",
+                      fontSize: 22,
+                    }}
+                    numberOfLines={1}
+                  >
+                    {program.title}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "rgba(255,255,255,0.86)",
+                      fontFamily: "WorkSans_500Medium",
+                      marginTop: 2,
+                    }}
+                    numberOfLines={1}
+                  >
+                    Goal: {program.goal} • {program.lengthWeeks} weeks
+                  </Text>
+                </View>
 
-        <View style={{ height: 1, backgroundColor: outline, opacity: 0.6 }} />
+                {/* 3-dots */}
+                <Pressable
+                  onPress={() => setMenuOpen((v) => !v)}
+                  style={{ padding: 8, borderRadius: 999 }}
+                >
+                  <Ionicons name="ellipsis-horizontal" size={22} color="#fff" />
+                </Pressable>
+              </View>
+            </View>
 
-        {/* Phase switcher */}
-        <PhaseSwitcher
-          phases={program.phases}
-          activeIndex={phaseIdx}
-          onChange={setPhaseIdx}
-        />
-
-        {/* Days for current phase only */}
-        <View style={{ gap: 10 }}>
-          <H2>{phase.title || `Phase ${phaseIdx + 1}`}</H2>
-          {phase.days.length === 0 ? (
-            <P color="muted">No days yet.</P>
-          ) : (
-            phase.days.map((d) => (
-              <Pressable
-                key={d.id}
-                onPress={() => goDayView(d.id)} // open view page (not editor)
+            {/* Bottom description area with fade to transparent upwards */}
+            <View style={{ flex: 1, justifyContent: "flex-end" }}>
+              <View
                 style={{
-                  backgroundColor: surface,
-                  borderWidth: 1,
-                  borderColor: outline,
-                  borderRadius: 12,
-                  padding: 12,
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  backgroundColor: "rgba(0,0,0,0.25)",
                 }}
               >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        color: text,
-                        fontFamily: "Syne_700Bold",
-                        fontSize: 16,
-                      }}
-                    >
-                      {d.title}{" "}
+                <Text
+                  style={{
+                    color: "rgba(255,255,255,0.95)",
+                    fontFamily: "WorkSans_400Regular",
+                  }}
+                  numberOfLines={3}
+                >
+                  {program.description || "No program description yet."}
+                </Text>
+              </View>
+            </View>
+          </ImageBackground>
+
+          {/* actions sheet */}
+          {menuOpen ? (
+            <View
+              style={{
+                position: "absolute",
+                top: 12,
+                right: 12,
+                backgroundColor: surface,
+                borderColor: outline,
+                borderWidth: 1,
+                borderRadius: 12,
+                overflow: "hidden",
+              }}
+            >
+              <MenuItem
+                label="Edit program"
+                onPress={() => {
+                  setMenuOpen(false);
+                  router.push(`/programs/${program.id}/edit`);
+                }}
+              />
+              <MenuItem
+                label="Export (soon)"
+                onPress={() => setMenuOpen(false)}
+              />
+              <MenuItem
+                label="Share as… (soon)"
+                onPress={() => setMenuOpen(false)}
+              />
+              <MenuItem
+                label="Delete program"
+                destructive
+                onPress={() => {
+                  setMenuOpen(false);
+                  removeProgram(program.id);
+                  router.replace("/");
+                }}
+              />
+            </View>
+          ) : null}
+        </View>
+
+        <View style={{ paddingHorizontal: 16, gap: 14 }}>
+          {/* Phase switcher pill container (rounded like pills) */}
+          <View
+            style={{
+              borderWidth: 1,
+              borderColor: outline,
+              borderRadius: 999, // pill container
+              backgroundColor: surface,
+              overflow: "hidden",
+            }}
+          >
+            <PhaseSwitcher
+              phases={program.phases}
+              activeIndex={phaseIdx}
+              onChange={setPhaseIdx}
+            />
+          </View>
+
+          {/* Days for current phase */}
+          <View style={{ gap: 10 }}>
+            <H2>{phase.title || `Phase ${phaseIdx + 1}`}</H2>
+            {phase.days.length === 0 ? (
+              <P color="muted">No days yet.</P>
+            ) : (
+              phase.days.map((d) => (
+                <Pressable
+                  key={d.id}
+                  onPress={() => goDayView(d.id)}
+                  style={{
+                    backgroundColor: surface,
+                    borderWidth: 1,
+                    borderColor: outline,
+                    borderRadius: 12,
+                    padding: 12,
+                  }}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View style={{ flex: 1 }}>
                       <Text
                         style={{
-                          color: muted,
-                          fontFamily: "WorkSans_400Regular",
+                          color: text,
+                          fontFamily: "Syne_700Bold",
+                          fontSize: 16,
                         }}
                       >
-                        • {d.type}
+                        {d.title}{" "}
+                        <Text
+                          style={{
+                            color: muted,
+                            fontFamily: "WorkSans_400Regular",
+                          }}
+                        >
+                          • {d.type}
+                        </Text>
                       </Text>
-                    </Text>
-                    {d.type === "workout" ? (
-                      <Text style={{ color: muted, marginTop: 2 }}>
-                        {d.durationMin} min • {d.numberOfExercises} exercises •{" "}
-                        {d.numberOfSets} sets
-                      </Text>
-                    ) : null}
+                      {d.type === "workout" ? (
+                        <Text style={{ color: muted, marginTop: 2 }}>
+                          {d.durationMin} min • {d.numberOfExercises} exercises
+                          • {d.numberOfSets} sets
+                        </Text>
+                      ) : null}
+                    </View>
+                    <Pressable
+                      onPress={() => goEditDay(d.id)}
+                      style={{ padding: 6, marginLeft: 6 }}
+                    >
+                      <Ionicons name="create-outline" size={18} color={text} />
+                    </Pressable>
+                    <Pressable
+                      onPress={() => deleteDay(d.id)}
+                      style={{ padding: 6 }}
+                    >
+                      <Ionicons name="trash-outline" size={18} color={text} />
+                    </Pressable>
                   </View>
-
-                  {/* actions on far right */}
-                  <Pressable
-                    onPress={() => goEditDay(d.id)}
-                    style={{ padding: 6, marginLeft: 6 }}
-                  >
-                    <Ionicons name="create-outline" size={18} color={primary} />
-                  </Pressable>
-                  <Pressable
-                    onPress={() => deleteDay(d.id)}
-                    style={{ padding: 6 }}
-                  >
-                    <Ionicons name="trash-outline" size={18} color={primary} />
-                  </Pressable>
-                </View>
-              </Pressable>
-            ))
-          )}
+                </Pressable>
+              ))
+            )}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const MenuItem: React.FC<{
+  label: string;
+  onPress: () => void;
+  destructive?: boolean;
+}> = ({ label, onPress, destructive }) => {
+  const text = useThemeColor({}, "text");
+  const accentAlt = useThemeColor({}, "accentAlt");
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{ paddingVertical: 10, paddingHorizontal: 12 }}
+    >
+      <Text
+        style={{
+          color: destructive ? accentAlt : text,
+          fontFamily: "WorkSans_600SemiBold",
+        }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+};

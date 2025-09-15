@@ -5,10 +5,12 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "eas-Android": "eas build --platform android --profile development",
+    "eas-Ios": "eas build --platform ios --profile development"
   },
   "dependencies": {
     "@expo-google-fonts/syne": "^0.4.1",
@@ -22,6 +24,7 @@
     "@react-navigation/native": "^7.1.8",
     "expo": "~54.0.7",
     "expo-constants": "~18.0.8",
+    "expo-dev-client": "~6.0.12",
     "expo-font": "~14.0.8",
     "expo-haptics": "~15.0.7",
     "expo-image": "~3.0.8",

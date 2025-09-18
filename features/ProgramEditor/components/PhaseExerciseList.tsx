@@ -1,4 +1,5 @@
-import { Phase } from "@/entities/program/zod";
+import { Phase, WorkoutDay } from "@/entities/program/zod";
+import { workoutDaySummary } from "@/features/ProgramEditor/helpers/summary";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
 import { Text, View } from "react-native";
@@ -10,7 +11,9 @@ export const PhaseExerciseList: React.FC<{ phase: Phase }> = ({ phase }) => {
   const muted = useThemeColor({}, "muted");
   const primary = useThemeColor({}, "primary");
 
-  const workouts = phase.days.filter((d) => d.type === "workout");
+  const workouts = phase.days.filter(
+    (d): d is WorkoutDay => d.type === "workout"
+  );
 
   if (workouts.length === 0) {
     return (
@@ -43,11 +46,16 @@ export const PhaseExerciseList: React.FC<{ phase: Phase }> = ({ phase }) => {
             </Text>
           </Text>
 
+          {/* 🔹 NEW: read-only day summary */}
+          <Text style={{ color: muted, fontFamily: "WorkSans_400Regular" }}>
+            {workoutDaySummary(d)}
+          </Text>
+
           {d.series.length === 0 ? (
             <Text style={{ color: muted }}>No exercises yet.</Text>
           ) : (
             <View style={{ gap: 6 }}>
-              {d.series.map((s, si) => (
+              {d.series.map((s) => (
                 <View key={s.id} style={{ gap: 4 }}>
                   <Text
                     style={{
@@ -57,18 +65,30 @@ export const PhaseExerciseList: React.FC<{ phase: Phase }> = ({ phase }) => {
                   >
                     Series {s.label}
                   </Text>
-                  {s.items.map((ex, ei) => (
-                    <Text
-                      key={ex.id}
-                      style={{ color: text, fontFamily: "WorkSans_400Regular" }}
-                      numberOfLines={1}
-                    >
-                      {`${s.label}${ei + 1}`} • {ex.title || "Untitled"}{" "}
-                      <Text style={{ color: muted }}>
-                        ({ex.reps.join(" / ")} reps, tempo {ex.tempo.join("/")})
+
+                  {s.items.map((ex, ei) => {
+                    const repsDisplay =
+                      ex.sets.length > 0
+                        ? ex.sets.map((st) => st.reps).join(" / ")
+                        : "—";
+                    const tempoDisplay = ex.tempo.join("/");
+
+                    return (
+                      <Text
+                        key={ex.id}
+                        style={{
+                          color: text,
+                          fontFamily: "WorkSans_400Regular",
+                        }}
+                        numberOfLines={1}
+                      >
+                        {`${s.label}${ei + 1}`} • {ex.title || "Untitled"}{" "}
+                        <Text style={{ color: muted }}>
+                          ({repsDisplay} reps, tempo {tempoDisplay})
+                        </Text>
                       </Text>
-                    </Text>
-                  ))}
+                    );
+                  })}
                 </View>
               ))}
             </View>

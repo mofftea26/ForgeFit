@@ -1,3 +1,8 @@
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import React from "react";
+import { Image, Pressable, Text, View } from "react-native";
+
 import { MultiSelectField } from "@/components/ui/forms/MultiSelectField";
 import { NumberInput } from "@/components/ui/forms/NumberInput";
 import { TextArea } from "@/components/ui/forms/TextArea";
@@ -5,11 +10,7 @@ import { TextField } from "@/components/ui/forms/TextField";
 import { SeriesBuilder } from "@/components/ui/workout/SeriesBuilder";
 import { WorkoutDay } from "@/entities/program/zod";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import React from "react";
-import { Image, Pressable, View } from "react-native";
-import { deriveCounts } from "../helpers/derive";
+import { summaryLabel } from "../helpers/summary";
 
 export const WorkoutDayEditor: React.FC<{
   value: WorkoutDay & { imageUrl?: string };
@@ -18,6 +19,8 @@ export const WorkoutDayEditor: React.FC<{
   const outline = useThemeColor({}, "outline");
   const bg = useThemeColor({}, "surface");
   const text = useThemeColor({}, "text");
+  const muted = useThemeColor({}, "muted");
+  const primary = useThemeColor({}, "primary");
 
   async function pickDayImage() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -30,6 +33,8 @@ export const WorkoutDayEditor: React.FC<{
       onChange({ imageUrl: res.assets[0].uri });
     }
   }
+
+  const summary = summaryLabel(value.series);
 
   return (
     <View style={{ gap: 12 }}>
@@ -82,6 +87,24 @@ export const WorkoutDayEditor: React.FC<{
         </View>
       </View>
 
+      {/* Read-only summary */}
+      <View
+        style={{
+          borderWidth: 1,
+          borderColor: outline,
+          borderRadius: 10,
+          paddingVertical: 8,
+          paddingHorizontal: 10,
+          backgroundColor: bg,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Text style={{ color: muted }}>{summary}</Text>
+        <Text style={{ color: primary, fontWeight: "600" }}>Read-only</Text>
+      </View>
+
       <TextArea
         label="Description"
         value={value.description}
@@ -121,13 +144,13 @@ export const WorkoutDayEditor: React.FC<{
         onChange={(list) => onChange({ equipmentNeeded: list as string[] })}
       />
 
-      {/* Series builder (with pill targets from above) */}
+      {/* Series builder */}
       <SeriesBuilder
         selectedTargets={value.targetMuscleGroups ?? []}
         value={value.series as any}
         onChange={(series) => {
-          const derived = deriveCounts(series as any);
-          onChange({ series: series as any, ...derived });
+          // read-only summary updates automatically since it's derived from series
+          onChange({ series: series as any });
         }}
       />
     </View>

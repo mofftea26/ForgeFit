@@ -7,7 +7,7 @@ export const FAB: React.FC<{ onPress?: () => void }> = ({ onPress }) => {
   const tint = useThemeColor({}, "primarySoft");
   const bg = useThemeColor({}, "background");
   const inset = useSafeAreaInsets();
-  const bottom = Math.max(inset.bottom, 16); // keep off the gesture bar
+  const bottom = Math.max(inset.bottom + 16, 16); // keep off the gesture bar
 
   return (
     <Pressable

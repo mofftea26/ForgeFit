@@ -11,7 +11,13 @@ import React, {
   useMemo,
   useRef,
 } from "react";
-import { Dimensions, Platform, View, ViewStyle } from "react-native";
+import {
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  View,
+  ViewStyle,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export type AppBottomSheetRef = {
@@ -56,9 +62,11 @@ export const AppBottomSheetInner = forwardRef<
     const insets = useSafeAreaInsets();
     const { height: screenH } = Dimensions.get("window");
     const maxHeight = Math.round(screenH * maxHeightRatio);
+
     const indicatorColor = useThemeColor({}, "primary");
     const backgroundColor = useThemeColor({}, "background");
     const outlineColor = useThemeColor({}, "outline");
+
     const snapPoints = useMemo(() => [maxHeight * 0.5, maxHeight], [maxHeight]);
 
     useImperativeHandle(ref, () => ({
@@ -67,10 +75,8 @@ export const AppBottomSheetInner = forwardRef<
       snapTo: (index: number) => bottomSheetRef.current?.snapToIndex(index),
     }));
 
-    const containerPaddingBottom =
-      Platform.OS === "ios" ? Math.max(insets.bottom, 12) : 12;
-
-    const Inner = scrollable ? BottomSheetScrollView : BottomSheetView;
+    const safeBottom = Math.max(insets.bottom, 12);
+    const Body = scrollable ? BottomSheetScrollView : BottomSheetView;
 
     return (
       <BottomSheet
@@ -80,9 +86,13 @@ export const AppBottomSheetInner = forwardRef<
         enablePanDownToClose={enablePanDownToClose}
         onChange={onChangeIndex}
         handleIndicatorStyle={{ backgroundColor: indicatorColor }}
-        keyboardBehavior="interactive"
+        // Keyboard behavior
+        keyboardBehavior="interactive" // iOS: sheet tracks keyboard
         keyboardBlurBehavior="restore"
-        android_keyboardInputMode="adjustResize"
+        android_keyboardInputMode="adjustResize" // Android: window resizes
+        // Insets
+        topInset={insets.top}
+        bottomInset={insets.bottom}
         backgroundStyle={{
           backgroundColor,
           borderTopLeftRadius: 18,
@@ -90,11 +100,27 @@ export const AppBottomSheetInner = forwardRef<
           borderWidth: outlineColor ? 1 : 0,
           borderColor: outlineColor,
         }}
+        // STICKY FOOTER (never scrolls)
+        footerComponent={() =>
+          FooterComponent ? (
+            <View
+              style={{
+                paddingHorizontal: contentPadding,
+                paddingTop: 12,
+                paddingBottom: safeBottom,
+                backgroundColor,
+              }}
+            >
+              {FooterComponent}
+            </View>
+          ) : null
+        }
       >
-        <View
-          style={{
-            maxHeight,
-          }}
+        {/* Keyboard-aware wrapper made for @gorhom/bottom-sheet */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ maxHeight, flex: 1 }}
+          keyboardVerticalOffset={0} // you can tweak if you have a custom header stack height
         >
           {HeaderComponent ? (
             <View
@@ -107,41 +133,29 @@ export const AppBottomSheetInner = forwardRef<
             </View>
           ) : null}
 
-          <Inner
+          <Body
             bounces={false}
-            keyboardShouldPersistTaps="handled" // CHANGED
+            keyboardShouldPersistTaps="handled"
             contentContainerStyle={[
               {
                 paddingHorizontal: contentPadding,
                 paddingTop: HeaderComponent ? 12 : contentPadding,
-                paddingBottom: FooterComponent ? 12 : containerPaddingBottom,
-                flexGrow: 1, // CHANGED
-                minHeight: 1, // CHANGED
+                // keep some space above the sticky footer edge when scrolled to bottom
+                paddingBottom: 12,
+                flexGrow: 1,
+                minHeight: 1,
               },
               contentStyle,
             ]}
           >
             {children}
-          </Inner>
-
-          {FooterComponent ? (
-            <View
-              style={{
-                paddingHorizontal: contentPadding,
-                paddingBottom: containerPaddingBottom,
-                paddingTop: 80,
-              }}
-            >
-              {FooterComponent}
-            </View>
-          ) : null}
-        </View>
+          </Body>
+        </KeyboardAvoidingView>
       </BottomSheet>
     );
   }
 );
 
 AppBottomSheetInner.displayName = "AppBottomSheet";
-
 export const AppBottomSheet = memo(AppBottomSheetInner);
 export default AppBottomSheet;

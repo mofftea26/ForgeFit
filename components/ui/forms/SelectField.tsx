@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Field, FieldProps } from "./Field";
 
 export type SelectOption<T extends string | number> = {
@@ -48,7 +49,8 @@ export function SelectField<T extends string | number>({
   const muted = useThemeColor({}, "muted");
   const tint = useThemeColor({}, "primarySoft");
   const sheetBg = useThemeColor({}, "background");
-
+  const insets = useSafeAreaInsets();
+  const safeBottom = Math.max(insets.bottom, 12);
   const selected = options.find((o) => o.value === value);
 
   const filtered = useMemo(() => {
@@ -189,6 +191,7 @@ export function SelectField<T extends string | number>({
               borderRadius: 12,
               borderWidth: 1,
               borderColor: outline,
+              marginBottom: safeBottom,
             }}
           >
             <Text style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>

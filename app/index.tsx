@@ -2,14 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React from "react";
-import {
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  View,
-} from "react-native";
+import { Image, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import AppBottomSheet, {
@@ -17,10 +10,10 @@ import AppBottomSheet, {
 } from "@/components/ui/AppBottomSheet";
 
 import { Button } from "@/components/ui/Button";
+import { BottomSheetTextArea } from "@/components/ui/forms/BottomSheetTextArea";
+import { BottomSheetTextField } from "@/components/ui/forms/BottomSheetTextField";
 import { NumberInput } from "@/components/ui/forms/NumberInput";
 import { SelectField } from "@/components/ui/forms/SelectField";
-import { TextArea } from "@/components/ui/forms/TextArea";
-import { TextField } from "@/components/ui/forms/TextField";
 import { H1, H2, P } from "@/components/ui/Typography";
 import type { Program } from "@/entities/program/zod";
 import { EmptyPrograms } from "@/features/Home/components/EmptyPrograms";
@@ -145,7 +138,7 @@ export default function HomeScreen() {
         maxHeightRatio={0.9}
         HeaderComponent={editing ? <H2>Edit program</H2> : null}
         FooterComponent={
-          <View style={{ flexDirection: "row", gap: 10 }}>
+          <View style={{ flexDirection: "row" }}>
             <View style={{ flex: 1 }}>
               <Button
                 title="Cancel"
@@ -165,95 +158,89 @@ export default function HomeScreen() {
           </View>
         }
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1 }}
+        <Pressable
+          onPress={pickImage}
+          style={{
+            width: "100%",
+            height: 160,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: outline,
+            backgroundColor: bg,
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+            marginBottom: 12,
+          }}
         >
-          <Pressable
-            onPress={pickImage}
-            style={{
-              width: "100%",
-              height: 160,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: outline,
-              backgroundColor: bg,
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-              marginBottom: 12,
-            }}
-          >
-            {imageUri ? (
-              <Image
-                source={{ uri: imageUri }}
-                style={{ width: "100%", height: "100%" }}
-                resizeMode="cover"
-              />
-            ) : (
-              <View style={{ alignItems: "center", gap: 8 }}>
-                <View
-                  style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: 30,
-                    borderWidth: 1,
-                    borderColor: outline,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Ionicons name="image-outline" size={24} color={text} />
-                </View>
-                <P color="muted">Tap to choose an image</P>
+          {imageUri ? (
+            <Image
+              source={{ uri: imageUri }}
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={{ alignItems: "center", gap: 8 }}>
+              <View
+                style={{
+                  width: 60,
+                  height: 60,
+                  borderRadius: 30,
+                  borderWidth: 1,
+                  borderColor: outline,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Ionicons name="image-outline" size={24} color={text} />
               </View>
-            )}
-          </Pressable>
-
-          {/* Form */}
-          <TextField
-            label="Title"
-            value={title}
-            onChangeText={setTitle}
-            required
-          />
-
-          <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
-            <View style={{ flex: 1 }}>
-              <SelectField
-                label="Goal"
-                options={[
-                  { label: "Cut", value: "cut" },
-                  { label: "Bulk", value: "bulk" },
-                  { label: "Recomp", value: "recomp" },
-                  { label: "Strength", value: "strength" },
-                  { label: "Endurance", value: "endurance" },
-                ]}
-                value={goal}
-                onChange={(g) => setGoal(g as Program["goal"])}
-              />
+              <P color="muted">Tap to choose an image</P>
             </View>
-            <View style={{ width: 130 }}>
-              <NumberInput
-                label="Weeks"
-                value={weeks}
-                onChange={setWeeks}
-                min={1}
-                max={104}
-                step={1}
-              />
-            </View>
+          )}
+        </Pressable>
+
+        {/* Form */}
+        <BottomSheetTextField
+          label="Title"
+          value={title}
+          onChangeText={setTitle}
+          required
+        />
+
+        <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+          <View style={{ flex: 1 }}>
+            <SelectField
+              label="Goal"
+              options={[
+                { label: "Cut", value: "cut" },
+                { label: "Bulk", value: "bulk" },
+                { label: "Recomp", value: "recomp" },
+                { label: "Strength", value: "strength" },
+                { label: "Endurance", value: "endurance" },
+              ]}
+              value={goal}
+              onChange={(g) => setGoal(g as Program["goal"])}
+            />
           </View>
+          <View style={{ width: 130 }}>
+            <NumberInput
+              label="Weeks"
+              value={weeks}
+              onChange={setWeeks}
+              min={1}
+              max={104}
+              step={1}
+            />
+          </View>
+        </View>
 
-          <TextArea
-            label="Description"
-            value={description}
-            onChangeText={setDescription}
-            placeholder="What this program is about…"
-            multiline
-            style={{ minHeight: 100, textAlignVertical: "top" }}
-          />
-        </KeyboardAvoidingView>
+        <BottomSheetTextArea
+          label="Description"
+          value={description}
+          onChangeText={setDescription}
+          placeholder="What this program is about…"
+          style={{ minHeight: 100, textAlignVertical: "top" }}
+        />
       </AppBottomSheet>
     </SafeAreaView>
   );

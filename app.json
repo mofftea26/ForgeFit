@@ -1,15 +1,20 @@
 {
   "expo": {
-    "name": "forgefit",
+    "name": "ForgeFit",
     "slug": "forgefit",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "forgefit",
+    "scheme": "ForgeFit",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.dancho26.forgefit",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +25,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.dancho26.forgefit"
+      "package": "com.dancho26.forgefit",
+      "versionCode": 1
     },
     "web": {
       "output": "static",

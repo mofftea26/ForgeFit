@@ -1,50 +1,87 @@
-# Welcome to your Expo app 👋
+# ForgeFit
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+ForgeFit is a **React Native + Expo** mobile app designed for **program building, workout planning, and tracking**.  
+It follows a **feature-based architecture** with strong **type safety (Zod)**, **state management (Zustand)**, and **modern UI patterns**.
 
-## Get started
+---
 
-1. Install dependencies
+## ⚡ Quick Start
 
-   ```bash
-   npm install
-   ```
+Get the app running in 3 steps:
 
-2. Start the app
+````bash
+# 1. Clone the repo
+git clone https://github.com/mofftea26/ForgeFit.git
+cd ForgeFit
 
-   ```bash
-   npx expo start
-   ```
+# 2. Install dependencies
+pnpm install
 
-In the output, you'll find options to open the app in a
+# 3. Run in Expo
+pnpm start
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🚀 Tech Stack
 
-## Get a fresh project
+- **Expo SDK 54** (React Native 0.81, React 19)
+- **Expo Router** for navigation
+- **Zustand** for state management
+- **Zod** for validation & types
+- **Formik** for forms
+- **Lucide + Ionicons** for icons
+- **Expo modules**: image picker, haptics, linear gradient, fonts
+- **Reanimated + Gesture Handler** for gestures and animations
 
-When you're ready, run:
+---
+
+## 📂 Documentation
+
+This repo ships with a full `/docs` folder for maintainers and contributors:
+
+- [Architecture](./docs/ARCHITECTURE.md)
+- [Folder Structure](./docs/FOLDER_STRUCTURE.md)
+- [Design Patterns](./docs/PATTERNS.md)
+- [Features](./docs/FEATURES.md)
+- [Screens](./docs/SCREENS.md)
+- [Libraries](./docs/LIBRARIES.md)
+- [State Management](./docs/STATE.md)
+- [Types & Validation](./docs/TYPES_AND_VALIDATION.md)
+- [Theming](./docs/THEMING.md)
+- [Components](./docs/COMPONENTS.md)
+- [Assets](./docs/ASSETS.md)
+- [Typography](./docs/TYPOGRAPHY.md)
+
+---
+
+## 🛠 Development
+
+### Requirements
+
+- Node.js (LTS)
+- pnpm
+- Expo CLI
+- Android Studio / Xcode for native builds
+
+### Scripts
 
 ```bash
-npm run reset-project
-```
+# Start metro bundler
+pnpm start
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+# Reset project (custom script)
+pnpm reset-project
 
-## Learn more
+# Run on device
+pnpm android
+pnpm ios
 
-To learn more about developing your project with Expo, look at the following resources:
+# Web preview
+pnpm web
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+# Lint code
+pnpm lint
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# EAS builds
+pnpm eas-Android
+pnpm eas-Ios
+````

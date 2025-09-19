@@ -18,7 +18,7 @@ export const PhaseBar: React.FC<{
       style={{
         borderWidth: 1,
         borderColor: outline,
-        borderRadius: 999, // pill container
+        borderRadius: 999,
         backgroundColor: surface,
         overflow: "hidden",
       }}

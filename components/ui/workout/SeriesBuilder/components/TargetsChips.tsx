@@ -1,6 +1,7 @@
+import { P } from "@/components/ui/Typography";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 export const TargetsChips: React.FC<{
   options: string[];
@@ -15,7 +16,7 @@ export const TargetsChips: React.FC<{
 
   return (
     <View>
-      <Text
+      <P
         style={{
           color: text,
           fontWeight: "600",
@@ -24,7 +25,7 @@ export const TargetsChips: React.FC<{
         }}
       >
         Target muscles
-      </Text>
+      </P>
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
         {options.map((opt) => {
           const active = value.includes(opt);
@@ -41,9 +42,9 @@ export const TargetsChips: React.FC<{
                 backgroundColor: active ? tint : "transparent",
               }}
             >
-              <Text style={{ color: active ? "#fff" : text, fontSize: 12 }}>
+              <P style={{ color: active ? "#fff" : text, fontSize: 12 }}>
                 {opt}
-              </Text>
+              </P>
             </Pressable>
           );
         })}

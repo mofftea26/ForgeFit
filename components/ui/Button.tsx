@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   GestureResponderEvent,
   Pressable,
-  Text,
   TextStyle,
   View,
   ViewStyle,
@@ -18,6 +17,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { P } from "./Typography";
 
 type Variant =
   | "primary"
@@ -268,19 +268,19 @@ export const Button: React.FC<ButtonProps> = ({
 
         {/* Title */}
         {title ? (
-          <Text
+          <P
             style={[
               {
                 color: textColor,
                 fontSize: FONT,
                 fontFamily: "WorkSans_600SemiBold",
               },
-              textStyle,
+              textStyle ?? {},
             ]}
             numberOfLines={1}
           >
             {title}
-          </Text>
+          </P>
         ) : null}
 
         {/* Trailing */}

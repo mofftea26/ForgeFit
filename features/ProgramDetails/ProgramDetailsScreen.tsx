@@ -10,7 +10,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -89,7 +88,7 @@ export function ProgramDetailsScreen() {
                 </Pressable>
 
                 <View style={{ flex: 1 }}>
-                  <Text
+                  <P
                     style={{
                       color: "#fff",
                       fontFamily: "Syne_700Bold",
@@ -98,8 +97,8 @@ export function ProgramDetailsScreen() {
                     numberOfLines={1}
                   >
                     {program.title}
-                  </Text>
-                  <Text
+                  </P>
+                  <P
                     style={{
                       color: "rgba(255,255,255,0.86)",
                       fontFamily: "WorkSans_500Medium",
@@ -108,7 +107,7 @@ export function ProgramDetailsScreen() {
                     numberOfLines={1}
                   >
                     Goal: {program.goal} • {program.lengthWeeks} weeks
-                  </Text>
+                  </P>
                 </View>
 
                 <Pressable
@@ -132,7 +131,7 @@ export function ProgramDetailsScreen() {
                 paddingVertical: 16,
               }}
             >
-              <Text
+              <P
                 style={{
                   color: "rgba(255,255,255,0.95)",
                   fontFamily: "WorkSans_400Regular",
@@ -141,7 +140,7 @@ export function ProgramDetailsScreen() {
                 numberOfLines={3}
               >
                 {program.description || "No program description yet."}
-              </Text>
+              </P>
             </LinearGradient>
           </ImageBackground>
 

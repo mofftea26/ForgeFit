@@ -40,7 +40,7 @@ export function HomeScreen() {
           <View style={{ gap: 8 }}>
             <View>
               <H1 style={{ color: text }}>ForgeFit</H1>
-              <H2 color="primary">Workout Builder</H2>
+              <H2 color="primary">Forge Yourself</H2>
             </View>
             <View
               style={{

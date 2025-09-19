@@ -1,6 +1,7 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
+import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
 
 export type RepsSetsFieldProps = Omit<FieldProps, "children"> & {
@@ -60,9 +61,9 @@ export const RepsSetsField: React.FC<RepsSetsFieldProps> = ({
               paddingVertical: 8,
             }}
           >
-            <Text style={{ color: muted, fontFamily: "WorkSans_600SemiBold" }}>
+            <P style={{ color: muted, fontFamily: "WorkSans_600SemiBold" }}>
               Set {i + 1}
-            </Text>
+            </P>
             <TextInput
               value={String(val ?? "")}
               onChangeText={(t) => setAt(i, t)}
@@ -79,11 +80,11 @@ export const RepsSetsField: React.FC<RepsSetsFieldProps> = ({
               }}
             />
             <Pressable onPress={() => removeSet(i)}>
-              <Text
+              <P
                 style={{ color: accentAlt, fontFamily: "WorkSans_600SemiBold" }}
               >
                 ×
-              </Text>
+              </P>
             </Pressable>
           </View>
         ))}
@@ -102,9 +103,9 @@ export const RepsSetsField: React.FC<RepsSetsFieldProps> = ({
             justifyContent: "center",
           }}
         >
-          <Text style={{ color: primary, fontFamily: "WorkSans_600SemiBold" }}>
+          <P style={{ color: primary, fontFamily: "WorkSans_600SemiBold" }}>
             + Add set
-          </Text>
+          </P>
         </Pressable>
       </View>
     </Field>

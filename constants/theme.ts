@@ -1,9 +1,15 @@
-// constants/theme.ts
 import { Platform } from "react-native";
 
 /**
  * Brand palette (ForgeFit)
  *  #9FE7F5  #429EBD  #053F5C  #F7AD19  #F27F0C
+ *
+ * New roles:
+ * - onTint/onPrimary/onAccent: readable text/icon on tinted/primary/accent surfaces
+ * - scrim: modal backdrop
+ * - surfaceElevated: subtle contrast block on top of surface
+ * - mediaBg: neutral backdrop behind media (images/video)
+ * - chipOnTintBg/chipOnTintBorder: chips/badges displayed over tinted headers
  */
 
 export const Colors = {
@@ -12,7 +18,7 @@ export const Colors = {
     text: "#0F1720",
     background: "#FFFFFF",
 
-    // Primary accent used by useThemeColor(...,'tint')
+    // Accents
     tint: "#429EBD",
 
     // UI
@@ -20,24 +26,38 @@ export const Colors = {
     tabIconDefault: "#9FE7F5",
     tabIconSelected: "#429EBD",
 
-    // Extra brand roles (added to BOTH themes so useThemeColor can read them)
-    primary: "#053F5C", // deep blue (headers/buttons bg if needed)
-    primarySoft: "#429EBD", // mid blue
-    primaryTint: "#9FE7F5", // light blue
+    // Brand roles
+    primary: "#053F5C",
+    primarySoft: "#429EBD",
+    primaryTint: "#9FE7F5",
 
-    accent: "#F7AD19", // gold (warnings/CTAs)
-    accentAlt: "#F27F0C", // orange (secondary CTA/active)
-    muted: "#8B94A7", // neutral text/icons
-    surface: "#F7F9FB", // card / sheet bg
-    outline: "#E5E9EF", // borders / dividers
+    accent: "#F7AD19",
+    accentAlt: "#F27F0C",
+    muted: "#8B94A7",
+    surface: "#F7F9FB",
+    outline: "#E5E9EF",
+
+    // NEW readable-on-* roles
+    onTint: "#FFFFFF",
+    onPrimary: "#FFFFFF",
+    onAccent: "#0F1720",
+
+    // NEW surfaces & effects
+    scrim: "rgba(5, 15, 20, 0.45)", // modal backdrop
+    surfaceElevated: "#F4F7FA", // subtle block inside sheets/cards
+    mediaBg: "#0B1420", // behind images/videos
+
+    // NEW chips/badges when placed on tinted backgrounds
+    chipOnTintBg: "rgba(255,255,255,0.18)",
+    chipOnTintBorder: "rgba(255,255,255,0.35)",
   },
 
   dark: {
     // Base
     text: "#ECEDEE",
-    background: "#0B1420", // dark navy, friendly with brand blues
+    background: "#0B1420",
 
-    // Primary accent used by useThemeColor(...,'tint')
+    // Accents
     tint: "#429EBD",
 
     // UI
@@ -45,7 +65,7 @@ export const Colors = {
     tabIconDefault: "#053F5C",
     tabIconSelected: "#429EBD",
 
-    // Extra brand roles (must exist in both themes)
+    // Brand roles
     primary: "#9FE7F5",
     primarySoft: "#429EBD",
     primaryTint: "#053F5C",
@@ -55,6 +75,20 @@ export const Colors = {
     muted: "#9BA1A6",
     surface: "#0E1A26",
     outline: "#132233",
+
+    // NEW readable-on-* roles
+    onTint: "#FFFFFF", // good contrast over #429EBD
+    onPrimary: "#0B1420", // readable over #9FE7F5
+    onAccent: "#0B1420",
+
+    // NEW surfaces & effects
+    scrim: "rgba(0,0,0,0.65)",
+    surfaceElevated: "#122133", // slightly lifted over surface
+    mediaBg: "#000000",
+
+    // NEW chips/badges on tinted backgrounds
+    chipOnTintBg: "rgba(255,255,255,0.12)",
+    chipOnTintBorder: "rgba(255,255,255,0.22)",
   },
 };
 

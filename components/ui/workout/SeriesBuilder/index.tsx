@@ -7,27 +7,20 @@ import {
   Trash2,
 } from "lucide-react-native";
 import React from "react";
-import {
-  Image,
-  LayoutChangeEvent,
-  Modal,
-  Pressable,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, LayoutChangeEvent, Modal, Pressable, View } from "react-native";
 
 import { Button } from "@/components/ui/Button";
+import { P } from "@/components/ui/Typography";
 import { NumberInput } from "@/components/ui/forms/NumberInput";
 import { TempoInputs } from "@/components/ui/forms/Tempo";
 import { TextArea } from "@/components/ui/forms/TextArea";
 import { TextField } from "@/components/ui/forms/TextField";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
-import { SetTypes } from "@/entities/program/constants";
 import type { SetType } from "@/entities/program/types";
 import type { Exercise, Series } from "@/entities/program/zod";
+import { SetTypePill } from "./components/SetTypePill";
+import { TargetsChips } from "./components/TargetsChips";
 
 // RN-safe id (or import your exported id() if available)
 const rid = () => Math.random().toString(36).slice(2, 10).toUpperCase();
@@ -121,9 +114,9 @@ export function SeriesBuilder({ value, onChange, selectedTargets }: Props) {
         >
           {/* Header: "Series A" (auto) + remove */}
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Text style={{ color: text, fontWeight: "700", fontSize: 14 }}>
+            <P style={{ color: text, fontWeight: "700", fontSize: 14 }}>
               Series {autoSeriesLabel(si)}
-            </Text>
+            </P>
             <View style={{ flex: 1 }} />
             <Pressable onPress={() => removeSeries(s.id)} hitSlop={8}>
               <Trash2 size={16} color={muted} />
@@ -133,7 +126,7 @@ export function SeriesBuilder({ value, onChange, selectedTargets }: Props) {
           {/* Exercises list */}
           <View style={{ gap: 8 }}>
             {s.items.length === 0 ? (
-              <Text style={{ color: muted, fontSize: 13 }}>No exercises.</Text>
+              <P style={{ color: muted, fontSize: 13 }}>No exercises.</P>
             ) : (
               s.items.map((ex, ei) => (
                 <ExerciseRow
@@ -165,7 +158,7 @@ export function SeriesBuilder({ value, onChange, selectedTargets }: Props) {
             }}
           >
             <Plus size={14} color={muted} />
-            <Text style={{ color: muted, fontSize: 13 }}>Add exercise</Text>
+            <P style={{ color: muted, fontSize: 13 }}>Add exercise</P>
           </Pressable>
         </View>
       ))}
@@ -187,7 +180,7 @@ export function SeriesBuilder({ value, onChange, selectedTargets }: Props) {
         }}
       >
         <Plus size={14} color="#fff" />
-        <Text style={{ color: "#fff", fontSize: 13 }}>Add series</Text>
+        <P style={{ color: "#fff", fontSize: 13 }}>Add series</P>
       </Pressable>
     </View>
   );
@@ -289,9 +282,7 @@ const ExerciseRow: React.FC<{
       {/* Code row: A1 + note (lightbulb) on the left */}
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <Text style={{ color: text, fontWeight: "700", fontSize: 13 }}>
-            {code}
-          </Text>
+          <P style={{ color: text, fontWeight: "700", fontSize: 13 }}>{code}</P>
           <Pressable onPress={() => setNoteOpen(true)} hitSlop={8}>
             <Lightbulb size={16} color={muted} />
           </Pressable>
@@ -360,12 +351,12 @@ const ExerciseRow: React.FC<{
             marginBottom: 2,
           }}
         >
-          <Text
+          <P
             style={{ width: 52, color: muted, fontWeight: "600", fontSize: 12 }}
           >
             Type
-          </Text>
-          <Text
+          </P>
+          <P
             style={{
               flex: 1,
               color: muted,
@@ -375,8 +366,8 @@ const ExerciseRow: React.FC<{
             }}
           >
             Reps
-          </Text>
-          <Text
+          </P>
+          <P
             style={{
               flex: 1,
               color: muted,
@@ -386,12 +377,12 @@ const ExerciseRow: React.FC<{
             }}
           >
             Rest
-          </Text>
-          <Text style={{ width: 28, color: "transparent" }}>.</Text>
+          </P>
+          <P style={{ width: 28, color: "transparent" }}>.</P>
         </View>
 
         {(ex.sets ?? []).length === 0 ? (
-          <Text style={{ color: muted, fontSize: 12 }}>No sets yet.</Text>
+          <P style={{ color: muted, fontSize: 12 }}>No sets yet.</P>
         ) : (
           (ex.sets ?? []).map((st) => (
             <View
@@ -459,7 +450,7 @@ const ExerciseRow: React.FC<{
           }}
         >
           <Plus size={12} color={muted} />
-          <Text style={{ color: muted, fontSize: 12 }}>Add set</Text>
+          <P style={{ color: muted, fontSize: 12 }}>Add set</P>
         </Pressable>
       </View>
 
@@ -477,9 +468,7 @@ const ExerciseRow: React.FC<{
 
       {/* Trainer note display (small, bottom) */}
       {!!ex.trainerNote && (
-        <Text style={{ color: muted, fontSize: 12 }}>
-          Note: {ex.trainerNote}
-        </Text>
+        <P style={{ color: muted, fontSize: 12 }}>Note: {ex.trainerNote}</P>
       )}
 
       {/* Trainer note modal — themed */}
@@ -503,9 +492,9 @@ const ExerciseRow: React.FC<{
               gap: 8,
             }}
           >
-            <Text style={{ color: text, fontWeight: "700", fontSize: 15 }}>
+            <P style={{ color: text, fontWeight: "700", fontSize: 15 }}>
               Trainer&apos;s Note
-            </Text>
+            </P>
             <TextArea
               label=""
               value={ex.trainerNote ?? ""}
@@ -522,170 +511,6 @@ const ExerciseRow: React.FC<{
           </View>
         </View>
       </Modal>
-    </View>
-  );
-};
-
-/* ================================== Set Type Controls ================================== */
-
-const SetTypePill: React.FC<{
-  value: SetType;
-  onChange: (v: SetType) => void;
-}> = ({ value, onChange }) => {
-  const outline = useThemeColor({}, "outline");
-  const tint = useThemeColor({}, "primarySoft");
-  const text = useThemeColor({}, "text");
-  const sheetBg = useThemeColor({}, "surface");
-  const sheetOutline = useThemeColor({}, "outline");
-  const muted = useThemeColor({}, "muted");
-
-  const [open, setOpen] = React.useState(false);
-
-  const CurrentIcon = SetTypes[value]?.icon ?? ImageIcon;
-
-  return (
-    <>
-      {/* circular type selector */}
-      <TouchableOpacity
-        onPress={async () => {
-          setOpen(true);
-          await Haptics.selectionAsync();
-        }}
-        style={{
-          width: 36,
-          height: 36,
-          borderRadius: 36,
-          borderWidth: 1,
-          borderColor: outline,
-          backgroundColor: tint,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <CurrentIcon size={16} color="#fff" />
-      </TouchableOpacity>
-
-      <Modal visible={open} animationType="slide" transparent>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.35)",
-            justifyContent: "flex-end",
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: sheetBg,
-              padding: 12,
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-              maxHeight: "70%",
-              borderWidth: 1,
-              borderColor: sheetOutline,
-            }}
-          >
-            <ScrollView contentContainerStyle={{ gap: 8 }}>
-              {Object.entries(SetTypes).map(([key, meta]) => {
-                const Icon = meta.icon;
-                return (
-                  <TouchableOpacity
-                    key={key}
-                    onPress={async () => {
-                      onChange(key as SetType);
-                      setOpen(false);
-                      await Haptics.selectionAsync();
-                    }}
-                    style={{
-                      borderWidth: 1,
-                      borderColor: sheetOutline,
-                      borderRadius: 12,
-                      padding: 10,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 10,
-                    }}
-                  >
-                    <Icon size={18} color={text} />
-                    <View style={{ flex: 1 }}>
-                      <Text
-                        style={{
-                          color: text,
-                          fontWeight: "700",
-                          marginBottom: 2,
-                          fontSize: 14,
-                        }}
-                      >
-                        {meta.title}
-                      </Text>
-                      <Text style={{ color: muted, fontSize: 13 }}>
-                        {meta.description}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-            <View style={{ height: 8 }} />
-            <Button
-              title="Close"
-              variant="ghost"
-              onPress={() => setOpen(false)}
-            />
-          </View>
-        </View>
-      </Modal>
-    </>
-  );
-};
-
-/* ==================================== Targets Chips ==================================== */
-
-const TargetsChips: React.FC<{
-  options: string[];
-  value: string[];
-  onToggle: (val: string) => void;
-}> = ({ options, value, onToggle }) => {
-  const outline = useThemeColor({}, "outline");
-  const tint = useThemeColor({}, "primarySoft");
-  const text = useThemeColor({}, "text");
-
-  if (!options?.length) return null;
-
-  return (
-    <View>
-      <Text
-        style={{
-          color: text,
-          fontWeight: "600",
-          marginBottom: 6,
-          fontSize: 13,
-        }}
-      >
-        Target muscles
-      </Text>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-        {options.map((opt) => {
-          const active = value.includes(opt);
-          return (
-            <Pressable
-              key={opt}
-              onPress={() => onToggle(opt)}
-              style={{
-                paddingVertical: 5,
-                paddingHorizontal: 10,
-                borderRadius: 999,
-                borderWidth: 1,
-                borderColor: outline,
-                backgroundColor: active ? tint : "transparent",
-              }}
-            >
-              <Text style={{ color: active ? "#fff" : text, fontSize: 12 }}>
-                {opt}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
     </View>
   );
 };

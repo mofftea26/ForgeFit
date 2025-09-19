@@ -3,18 +3,18 @@ import React from "react";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AccordionWrapper } from "@/components/ui/AccordionWrapper";
 import { P } from "@/components/ui/Typography";
 import type { RestDay, WorkoutDay } from "@/entities/program/zod";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useProgramStore } from "@/stores";
-import { ChipRow } from "./components/ChipRow";
+import { Info } from "lucide-react-native";
 import { DayHeader } from "./components/DayHeader";
-import { SeriesCard } from "./components/SeriesCard";
+import { InfoSectionWrapper } from "./components/InfoSectionWrapper";
+import { SeriesList } from "./components/SeriesList";
 
-// Narrow helper to read optional imageUrl safely if it exists on the object
 function pickOptionalImageUrl(day: WorkoutDay | RestDay): string | undefined {
   if (day.type !== "workout") return undefined;
-  // runtime check for a non-schema ad-hoc prop
   if ("imageUrl" in day && typeof (day as any).imageUrl === "string") {
     return (day as any).imageUrl as string;
   }
@@ -53,7 +53,7 @@ export function DayScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bg }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 96 }}>
         <DayHeader
           title={headerTitle}
           subtitle={headerSubtitle}
@@ -61,23 +61,24 @@ export function DayScreen() {
           description={day.description ?? ""}
           onBack={() => router.back()}
         />
-
-        {/* Meta chips */}
         {isWorkout && workoutDay && (
-          <View style={{ paddingHorizontal: 16, gap: 10 }}>
-            {!!workoutDay.targetMuscleGroups?.length && (
-              <ChipRow label="Targets" items={workoutDay.targetMuscleGroups} />
-            )}
-            {!!workoutDay.equipmentNeeded?.length && (
-              <ChipRow label="Equipment" items={workoutDay.equipmentNeeded} />
-            )}
+          <View style={{ paddingHorizontal: 16, gap: 12 }}>
+            <AccordionWrapper
+              title="Targets & Equipment"
+              Icon={Info}
+              defaultOpen
+            >
+              <InfoSectionWrapper
+                targets={workoutDay.targetMuscleGroups ?? []}
+                equipment={workoutDay.equipmentNeeded ?? []}
+              />
+            </AccordionWrapper>
           </View>
         )}
-
-        {/* Series list */}
-        <View style={{ padding: 16, gap: 12 }}>
+        {/* Series list – redesigned */}
+        <View style={{ padding: 16 }}>
           {isWorkout && workoutDay?.series?.length ? (
-            workoutDay.series.map((s) => <SeriesCard key={s.id} series={s} />)
+            <SeriesList series={workoutDay.series} />
           ) : (
             <View
               style={{
@@ -95,6 +96,24 @@ export function DayScreen() {
           )}
         </View>
       </ScrollView>
+
+      {/* Sticky CTA placeholder for future "Start Workout" */}
+      {/* 
+      <View
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          padding: 12,
+          backgroundColor: bg,
+          borderTopWidth: 1,
+          borderTopColor: outline,
+        }}
+      >
+        <Button title="Start workout" onPress={() => {}} />
+      </View>
+      */}
     </SafeAreaView>
   );
 }

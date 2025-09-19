@@ -1,6 +1,7 @@
+import { P } from "@/components/ui/Typography";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
 
 type Props = {
   label: string;
@@ -17,14 +18,14 @@ export function MenuItem({ label, onPress, destructive }: Props) {
       onPress={onPress}
       style={{ paddingVertical: 10, paddingHorizontal: 12 }}
     >
-      <Text
+      <P
         style={{
           color: destructive ? accentAlt : text,
           fontFamily: "WorkSans_600SemiBold",
         }}
       >
         {label}
-      </Text>
+      </P>
     </Pressable>
   );
 }

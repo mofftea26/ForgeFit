@@ -1,6 +1,7 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
 
 export type PillOption<T extends string | number> = { label: string; value: T };
@@ -55,14 +56,14 @@ export function PillSwitch<T extends string | number>({
                 alignItems: "center",
               }}
             >
-              <Text
+              <P
                 style={{
                   color: active ? "#fff" : text,
                   fontFamily: "WorkSans_600SemiBold",
                 }}
               >
                 {opt.label}
-              </Text>
+              </P>
             </Pressable>
           );
         })}

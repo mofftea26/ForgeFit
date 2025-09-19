@@ -1,15 +1,9 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
-import {
-  FlatList,
-  Modal,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, Modal, Pressable, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
 
 export type MultiOption<T extends string | number> = {
@@ -85,7 +79,7 @@ export function MultiSelectField<T extends string | number>({
           justifyContent: "center",
         }}
       >
-        <Text
+        <P
           style={{
             color: selectedLabels ? text : muted,
             fontFamily: "WorkSans_400Regular",
@@ -94,7 +88,7 @@ export function MultiSelectField<T extends string | number>({
           numberOfLines={1}
         >
           {selectedLabels || placeholder}
-        </Text>
+        </P>
       </Pressable>
 
       <Modal visible={open} animationType="slide" transparent>
@@ -157,7 +151,7 @@ export function MultiSelectField<T extends string | number>({
                     justifyContent: "space-between",
                   }}
                 >
-                  <Text
+                  <P
                     style={{
                       color: active ? "#fff" : text,
                       fontFamily: "WorkSans_600SemiBold",
@@ -165,7 +159,7 @@ export function MultiSelectField<T extends string | number>({
                     }}
                   >
                     {item.label}
-                  </Text>
+                  </P>
                   {active ? (
                     <Ionicons name="checkmark" size={18} color="#fff" />
                   ) : null}
@@ -185,9 +179,9 @@ export function MultiSelectField<T extends string | number>({
               marginBottom: safeBottom,
             }}
           >
-            <Text style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
+            <P style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
               Done
-            </Text>
+            </P>
           </Pressable>
         </View>
       </Modal>

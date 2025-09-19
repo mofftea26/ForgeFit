@@ -1,8 +1,15 @@
+import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
-import { Image as ImageIcon, Lightbulb, Trash2 } from "lucide-react-native";
+import {
+  Image as ImageIcon,
+  Lightbulb,
+  Plus,
+  Trash2,
+} from "lucide-react-native";
 import React from "react";
 import {
   Image,
+  LayoutChangeEvent,
   Modal,
   Pressable,
   ScrollView,
@@ -37,21 +44,25 @@ export function SeriesBuilder({ value, onChange, selectedTargets }: Props) {
   const text = useThemeColor({}, "text");
   const surface = useThemeColor({}, "surface");
   const muted = useThemeColor({}, "muted");
-
+  const primaryTint = useThemeColor({}, "primaryTint");
+  const primarySoft = useThemeColor({}, "primarySoft");
   const bump = (next: Series[]) => onChange(next);
   const autoSeriesLabel = (idx: number) =>
     String.fromCharCode("A".charCodeAt(0) + idx);
 
-  const addSeries = () => {
+  const addSeries = async () => {
     const label = autoSeriesLabel(value.length);
     const nextSeries: Series = { id: rid(), label, items: [], trainerNote: "" };
     bump([...value, nextSeries]);
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
-  const removeSeries = (seriesId: string) =>
+  const removeSeries = async (seriesId: string) => {
     bump(value.filter((s) => s.id !== seriesId));
+    await Haptics.selectionAsync();
+  };
 
-  const addExercise = (seriesIndex: number) => {
+  const addExercise = async (seriesIndex: number) => {
     const next = value.map((s, i) => {
       if (i !== seriesIndex) return s;
       const newExercise: Exercise = {
@@ -66,6 +77,7 @@ export function SeriesBuilder({ value, onChange, selectedTargets }: Props) {
       return { ...s, items: [...s.items, newExercise] };
     });
     bump(next);
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const patchExercise = (
@@ -83,35 +95,45 @@ export function SeriesBuilder({ value, onChange, selectedTargets }: Props) {
     bump(next);
   };
 
+  const removeExercise = async (seriesIndex: number, exId: string) => {
+    const next = value.map((s, i) =>
+      i !== seriesIndex
+        ? s
+        : { ...s, items: s.items.filter((e) => e.id !== exId) }
+    );
+    bump(next);
+    await Haptics.selectionAsync();
+  };
+
   return (
-    <View style={{ gap: 12 }}>
+    <View style={{ gap: 10 }}>
       {value.map((s, si) => (
         <View
           key={s.id}
           style={{
             borderWidth: 1,
-            borderColor: outline,
+            borderColor: primaryTint,
             borderRadius: 12,
-            padding: 12,
+            padding: 10,
             backgroundColor: surface,
             gap: 10,
           }}
         >
-          {/* Header: "Series A" + remove (auto label) */}
+          {/* Header: "Series A" (auto) + remove */}
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Text style={{ color: text, fontWeight: "700", fontSize: 16 }}>
+            <Text style={{ color: text, fontWeight: "700", fontSize: 14 }}>
               Series {autoSeriesLabel(si)}
             </Text>
             <View style={{ flex: 1 }} />
             <Pressable onPress={() => removeSeries(s.id)} hitSlop={8}>
-              <Trash2 size={18} color={muted} />
+              <Trash2 size={16} color={muted} />
             </Pressable>
           </View>
 
           {/* Exercises list */}
-          <View style={{ gap: 10 }}>
+          <View style={{ gap: 8 }}>
             {s.items.length === 0 ? (
-              <Text style={{ color: muted }}>No exercises.</Text>
+              <Text style={{ color: muted, fontSize: 13 }}>No exercises.</Text>
             ) : (
               s.items.map((ex, ei) => (
                 <ExerciseRow
@@ -119,17 +141,54 @@ export function SeriesBuilder({ value, onChange, selectedTargets }: Props) {
                   code={`${autoSeriesLabel(si)}${ei + 1}`} // A1, A2 / B1, B2 ...
                   ex={ex}
                   onPatch={(patch) => patchExercise(si, ex.id, patch)}
+                  onRemove={() => removeExercise(si, ex.id)} // ✅ exercise-level trash
                   dayTargets={selectedTargets}
                 />
               ))
             )}
           </View>
 
-          <Button title="Add exercise" onPress={() => addExercise(si)} />
+          {/* smaller ghost + Add exercise */}
+          <Pressable
+            onPress={() => addExercise(si)}
+            style={{
+              alignSelf: "flex-start",
+              paddingVertical: 6,
+              paddingHorizontal: 10,
+              borderRadius: 10,
+              borderWidth: 1,
+              borderColor: outline,
+              opacity: 0.9,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            <Plus size={14} color={muted} />
+            <Text style={{ color: muted, fontSize: 13 }}>Add exercise</Text>
+          </Pressable>
         </View>
       ))}
 
-      <Button title="Add series" variant="primary" onPress={addSeries} />
+      {/* smaller primary + Add series */}
+      <Pressable
+        onPress={addSeries}
+        style={{
+          alignSelf: "flex-start",
+          paddingVertical: 8,
+          paddingHorizontal: 12,
+          borderRadius: 10,
+          borderWidth: 1,
+          borderColor: outline,
+          backgroundColor: primarySoft,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 6,
+        }}
+      >
+        <Plus size={14} color="#fff" />
+        <Text style={{ color: "#fff", fontSize: 13 }}>Add series</Text>
+      </Pressable>
     </View>
   );
 }
@@ -140,15 +199,19 @@ const ExerciseRow: React.FC<{
   code: string; // e.g., "A1"
   ex: Exercise;
   onPatch: (patch: Partial<Exercise>) => void;
+  onRemove: () => void; // ✅ remove exercise
   dayTargets: string[];
-}> = ({ code, ex, onPatch, dayTargets }) => {
+}> = ({ code, ex, onPatch, onRemove, dayTargets }) => {
   const outline = useThemeColor({}, "outline");
   const text = useThemeColor({}, "text");
   const surface = useThemeColor({}, "surface");
   const muted = useThemeColor({}, "muted");
   const primarySoft = useThemeColor({}, "primarySoft");
+  const sheetBg = useThemeColor({}, "surface");
+  const sheetOutline = useThemeColor({}, "outline");
 
   const [noteOpen, setNoteOpen] = React.useState(false);
+  const [titleH, setTitleH] = React.useState(52); // measured height of title area
 
   async function pickImage() {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -159,83 +222,101 @@ const ExerciseRow: React.FC<{
     });
     if (!res.canceled && res.assets?.[0]?.uri) {
       onPatch({ imageUrl: res.assets[0].uri });
+      await Haptics.selectionAsync();
     }
   }
 
+  const onTitleLayout = (e: LayoutChangeEvent) => {
+    const h = Math.max(44, Math.round(e.nativeEvent.layout.height));
+    setTitleH(h);
+  };
+
   /* -------------------- Sets helpers -------------------- */
 
-  const addSet = () =>
+  const addSet = async () => {
     onPatch({
       sets: [
         ...(ex.sets ?? []),
         { id: rid(), type: "working" as SetType, reps: 10, rest: 60 },
       ],
     });
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
 
-  const removeSet = (setId: string) =>
+  const removeSet = async (setId: string) => {
     onPatch({ sets: (ex.sets ?? []).filter((s) => s.id !== setId) });
+    await Haptics.selectionAsync();
+  };
 
-  const patchSet = (
+  const patchSet = async (
     setId: string,
     patch: Partial<{ type: SetType; reps: number; rest: number }>
-  ) =>
+  ) => {
     onPatch({
       sets: (ex.sets ?? []).map((s) =>
         s.id === setId ? { ...s, ...patch } : s
       ),
     });
+    await Haptics.selectionAsync();
+  };
+
+  const imageSide = titleH * 0.65; // keep image square, match title block height
 
   return (
     <View
       style={{
-        borderWidth: 1,
-        borderColor: outline,
-        borderRadius: 10,
+        borderWidth: 1.5,
+        borderColor: primarySoft, // primary border
+        borderRadius: 12,
         padding: 10,
-        gap: 10,
+        paddingTop: 12,
+        gap: 8,
         backgroundColor: surface,
       }}
     >
-      {/* Exercise code line (A1) + note button (light bulb) */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
+      {/* Absolute exercise trash in top-right corner */}
+      <Pressable
+        onPress={async () => {
+          await Haptics.selectionAsync();
+          onRemove();
         }}
+        hitSlop={8}
+        style={{ position: "absolute", top: 8, right: 8, padding: 6 }}
       >
-        <Text
-          style={{
-            color: text,
-            fontWeight: "700",
-            fontSize: 14,
-          }}
-        >
-          {code}
-        </Text>
+        <Trash2 size={16} color={muted} />
+      </Pressable>
 
-        <Pressable onPress={() => setNoteOpen(true)} hitSlop={8}>
-          <Lightbulb size={18} color={muted} />
-        </Pressable>
+      {/* Code row: A1 + note (lightbulb) on the left */}
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <Text style={{ color: text, fontWeight: "700", fontSize: 13 }}>
+            {code}
+          </Text>
+          <Pressable onPress={() => setNoteOpen(true)} hitSlop={8}>
+            <Lightbulb size={16} color={muted} />
+          </Pressable>
+        </View>
+        <View style={{ flex: 1 }} />
       </View>
 
-      {/* Title + Image aligned in one row */}
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <View style={{ flex: 1 }}>
+      {/* Title + Image aligned to bottom; image matches title height & square */}
+      <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 8 }}>
+        <View style={{ flex: 1 }} onLayout={onTitleLayout}>
           <TextField
             label="Exercise"
             value={ex.title}
             onChangeText={(t) => onPatch({ title: t })}
             required
+            style={{ fontSize: 14 }} // slightly smaller
           />
         </View>
 
         <Pressable
           onPress={pickImage}
           style={{
-            width: 54,
-            height: 54,
-            borderRadius: 8,
+            width: imageSide,
+            height: imageSide,
+            borderRadius: 10,
             borderWidth: 1,
             borderColor: outline,
             alignItems: "center",
@@ -250,7 +331,7 @@ const ExerciseRow: React.FC<{
               resizeMode="cover"
             />
           ) : (
-            <ImageIcon size={20} color={muted} />
+            <ImageIcon size={18} color={muted} />
           )}
         </Pressable>
       </View>
@@ -259,50 +340,37 @@ const ExerciseRow: React.FC<{
       <TargetsChips
         options={dayTargets}
         value={ex.targetMuscles ?? []}
-        onToggle={(val) => {
+        onToggle={async (val) => {
           const has = (ex.targetMuscles ?? []).includes(val);
           const next = has
             ? (ex.targetMuscles ?? []).filter((v) => v !== val)
             : [...(ex.targetMuscles ?? []), val];
           onPatch({ targetMuscles: next });
+          await Haptics.selectionAsync();
         }}
       />
 
-      {/* Sets table: header ONCE, then rows */}
+      {/* Sets section: use full width; smaller inputs via transform scale */}
       <View style={{ gap: 6 }}>
-        {/* Header */}
+        {/* Header (use flex so it spans full width) */}
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
-            paddingHorizontal: 4,
             marginBottom: 2,
           }}
         >
           <Text
-            style={{
-              width: 56,
-              color: muted,
-              fontWeight: "600",
-              textAlign: "left",
-            }}
+            style={{ width: 52, color: muted, fontWeight: "600", fontSize: 12 }}
           >
             Type
           </Text>
           <Text
             style={{
-              width: 40,
+              flex: 1,
               color: muted,
               fontWeight: "600",
-            }}
-          >
-            {/* trash column */}
-          </Text>
-          <Text
-            style={{
-              width: 88,
-              color: muted,
-              fontWeight: "600",
+              fontSize: 12,
               textAlign: "center",
             }}
           >
@@ -310,20 +378,20 @@ const ExerciseRow: React.FC<{
           </Text>
           <Text
             style={{
-              width: 96,
+              flex: 1,
               color: muted,
               fontWeight: "600",
+              fontSize: 12,
               textAlign: "center",
             }}
           >
             Rest
           </Text>
-          <View style={{ flex: 1 }} />
+          <Text style={{ width: 28, color: "transparent" }}>.</Text>
         </View>
 
-        {/* Rows */}
         {(ex.sets ?? []).length === 0 ? (
-          <Text style={{ color: muted, marginLeft: 4 }}>No sets yet.</Text>
+          <Text style={{ color: muted, fontSize: 12 }}>No sets yet.</Text>
         ) : (
           (ex.sets ?? []).map((st) => (
             <View
@@ -331,21 +399,17 @@ const ExerciseRow: React.FC<{
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                gap: 8,
+                gap: 6,
+                width: "100%",
               }}
             >
-              {/* Type circle select */}
               <SetTypePill
                 value={st.type as SetType}
                 onChange={(t) => patchSet(st.id, { type: t })}
               />
 
-              {/* Trash close to the left */}
-              <Pressable onPress={() => removeSet(st.id)} hitSlop={8}>
-                <Trash2 size={18} color={muted} />
-              </Pressable>
-
-              <View style={{ width: 88 }}>
+              {/* Reps (smaller via transform), takes half of remaining width */}
+              <View style={{ flex: 1, transform: [{ scale: 0.92 }] }}>
                 <NumberInput
                   label=""
                   value={st.reps}
@@ -356,7 +420,8 @@ const ExerciseRow: React.FC<{
                 />
               </View>
 
-              <View style={{ width: 96 }}>
+              {/* Rest (smaller via transform), takes half of remaining width */}
+              <View style={{ flex: 1, transform: [{ scale: 0.92 }] }}>
                 <NumberInput
                   label=""
                   value={st.rest}
@@ -368,20 +433,50 @@ const ExerciseRow: React.FC<{
                 />
               </View>
 
-              <View style={{ flex: 1 }} />
+              {/* trash can at end of row (type-reps-rest-trash) */}
+              <Pressable
+                onPress={() => removeSet(st.id)}
+                hitSlop={8}
+                style={{ width: 28, alignItems: "center" }}
+              >
+                <Trash2 size={16} color={muted} />
+              </Pressable>
             </View>
           ))
         )}
 
-        <Button title="Add set" variant="ghost" onPress={addSet} />
+        {/* Smaller "+ Add set" button */}
+        <Pressable
+          onPress={addSet}
+          style={{
+            alignSelf: "flex-start",
+            paddingVertical: 4,
+            paddingHorizontal: 8,
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: outline,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+            marginTop: 2,
+          }}
+        >
+          <Plus size={12} color={muted} />
+          <Text style={{ color: muted, fontSize: 12 }}>Add set</Text>
+        </Pressable>
       </View>
 
-      {/* Tempo AFTER sets */}
-      <TempoInputs
-        label="Tempo"
-        value={ex.tempo as any}
-        onChange={(t: any) => onPatch({ tempo: t as any })}
-      />
+      {/* Tempo AFTER sets — slightly smaller via scaling */}
+      <View style={{ transform: [{ scale: 0.93 }], alignSelf: "flex-start" }}>
+        <TempoInputs
+          label="Tempo"
+          value={ex.tempo as any}
+          onChange={async (t: any) => {
+            onPatch({ tempo: t as any });
+            await Haptics.selectionAsync();
+          }}
+        />
+      </View>
 
       {/* Trainer note display (small, bottom) */}
       {!!ex.trainerNote && (
@@ -390,7 +485,7 @@ const ExerciseRow: React.FC<{
         </Text>
       )}
 
-      {/* Trainer note modal */}
+      {/* Trainer note modal — themed */}
       <Modal visible={noteOpen} animationType="slide" transparent>
         <View
           style={{
@@ -401,16 +496,18 @@ const ExerciseRow: React.FC<{
         >
           <View
             style={{
-              backgroundColor: "#111827",
-              padding: 14,
+              backgroundColor: sheetBg,
               borderTopLeftRadius: 16,
               borderTopRightRadius: 16,
               maxHeight: "65%",
-              gap: 10,
+              borderWidth: 1,
+              borderColor: sheetOutline,
+              padding: 12,
+              gap: 8,
             }}
           >
-            <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
-              Trainer's Note
+            <Text style={{ color: text, fontWeight: "700", fontSize: 15 }}>
+              Trainer&apos;s Note
             </Text>
             <TextArea
               label=""
@@ -418,7 +515,7 @@ const ExerciseRow: React.FC<{
               onChangeText={(t) => onPatch({ trainerNote: t })}
               placeholder="Cues, ranges, breathing, intent…"
               multiline
-              style={{ minHeight: 120, textAlignVertical: "top" }}
+              style={{ minHeight: 110, textAlignVertical: "top" }}
             />
             <Button
               title="Close"
@@ -440,6 +537,10 @@ const SetTypePill: React.FC<{
 }> = ({ value, onChange }) => {
   const outline = useThemeColor({}, "outline");
   const tint = useThemeColor({}, "primarySoft");
+  const text = useThemeColor({}, "text");
+  const sheetBg = useThemeColor({}, "surface");
+  const sheetOutline = useThemeColor({}, "outline");
+  const muted = useThemeColor({}, "muted");
 
   const [open, setOpen] = React.useState(false);
 
@@ -447,8 +548,12 @@ const SetTypePill: React.FC<{
 
   return (
     <>
+      {/* circular type selector */}
       <TouchableOpacity
-        onPress={() => setOpen(true)}
+        onPress={async () => {
+          setOpen(true);
+          await Haptics.selectionAsync();
+        }}
         style={{
           width: 36,
           height: 36,
@@ -460,7 +565,7 @@ const SetTypePill: React.FC<{
           justifyContent: "center",
         }}
       >
-        <CurrentIcon size={18} color="#fff" />
+        <CurrentIcon size={16} color="#fff" />
       </TouchableOpacity>
 
       <Modal visible={open} animationType="slide" transparent>
@@ -473,45 +578,49 @@ const SetTypePill: React.FC<{
         >
           <View
             style={{
-              backgroundColor: "#111827",
-              padding: 14,
+              backgroundColor: sheetBg,
+              padding: 12,
               borderTopLeftRadius: 16,
               borderTopRightRadius: 16,
               maxHeight: "70%",
+              borderWidth: 1,
+              borderColor: sheetOutline,
             }}
           >
-            <ScrollView contentContainerStyle={{ gap: 10 }}>
+            <ScrollView contentContainerStyle={{ gap: 8 }}>
               {Object.entries(SetTypes).map(([key, meta]) => {
                 const Icon = meta.icon;
                 return (
                   <TouchableOpacity
                     key={key}
-                    onPress={() => {
+                    onPress={async () => {
                       onChange(key as SetType);
                       setOpen(false);
+                      await Haptics.selectionAsync();
                     }}
                     style={{
                       borderWidth: 1,
-                      borderColor: "rgba(255,255,255,0.12)",
+                      borderColor: sheetOutline,
                       borderRadius: 12,
-                      padding: 12,
+                      padding: 10,
                       flexDirection: "row",
                       alignItems: "center",
                       gap: 10,
                     }}
                   >
-                    <Icon size={20} color="#fff" />
+                    <Icon size={18} color={text} />
                     <View style={{ flex: 1 }}>
                       <Text
                         style={{
-                          color: "#fff",
+                          color: text,
                           fontWeight: "700",
                           marginBottom: 2,
+                          fontSize: 14,
                         }}
                       >
                         {meta.title}
                       </Text>
-                      <Text style={{ color: "rgba(255,255,255,0.8)" }}>
+                      <Text style={{ color: muted, fontSize: 13 }}>
                         {meta.description}
                       </Text>
                     </View>
@@ -519,7 +628,7 @@ const SetTypePill: React.FC<{
                 );
               })}
             </ScrollView>
-            <View style={{ height: 10 }} />
+            <View style={{ height: 8 }} />
             <Button
               title="Close"
               variant="ghost"
@@ -547,10 +656,17 @@ const TargetsChips: React.FC<{
 
   return (
     <View>
-      <Text style={{ color: text, fontWeight: "600", marginBottom: 6 }}>
+      <Text
+        style={{
+          color: text,
+          fontWeight: "600",
+          marginBottom: 6,
+          fontSize: 13,
+        }}
+      >
         Target muscles
       </Text>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
         {options.map((opt) => {
           const active = value.includes(opt);
           return (
@@ -558,15 +674,17 @@ const TargetsChips: React.FC<{
               key={opt}
               onPress={() => onToggle(opt)}
               style={{
-                paddingVertical: 6,
-                paddingHorizontal: 12,
+                paddingVertical: 5,
+                paddingHorizontal: 10,
                 borderRadius: 999,
                 borderWidth: 1,
                 borderColor: outline,
                 backgroundColor: active ? tint : "transparent",
               }}
             >
-              <Text style={{ color: active ? "#fff" : text }}>{opt}</Text>
+              <Text style={{ color: active ? "#fff" : text, fontSize: 12 }}>
+                {opt}
+              </Text>
             </Pressable>
           );
         })}

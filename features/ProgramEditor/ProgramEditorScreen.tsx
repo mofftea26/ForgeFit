@@ -5,8 +5,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
+import { RestDay, WorkoutDay } from "@/entities/program/zod";
 import {
   DayList,
   PhaseBar,
@@ -30,7 +34,8 @@ export function ProgramEditorScreen() {
   const text = useThemeColor({}, "text");
   const primary = useThemeColor({}, "primary");
   const router = useRouter();
-
+  const insets = useSafeAreaInsets();
+  const surface = useThemeColor({}, "surface");
   const {
     program,
     phase,
@@ -62,25 +67,31 @@ export function ProgramEditorScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bg }}>
+      {/* Header */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+          padding: 16,
+        }}
+      >
+        <Ionicons
+          name="chevron-back"
+          size={22}
+          color={text}
+          onPress={() => router.back()}
+        />
+        <View style={{ flex: 1 }}>
+          <H1>{program.title}</H1>
+          <H2 color="primary">Editor</H2>
+        </View>
+      </View>
+
+      <View style={{ height: 1, backgroundColor: outline, opacity: 0.6 }} />
       <ScrollView
         contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 80 }}
       >
-        {/* Header */}
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-          <Ionicons
-            name="chevron-back"
-            size={22}
-            color={text}
-            onPress={() => router.back()}
-          />
-          <View style={{ flex: 1 }}>
-            <H1>{program.title}</H1>
-            <H2 color="primary">Editor</H2>
-          </View>
-        </View>
-
-        <View style={{ height: 1, backgroundColor: outline, opacity: 0.6 }} />
-
         {/* Phase bar */}
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <View style={{ flex: 1 }}>
@@ -117,35 +128,54 @@ export function ProgramEditorScreen() {
         {selectedDay?.type === "workout" ? (
           <WorkoutDayEditor
             value={selectedDay}
-            onChange={(patch) => patchDay(selectedDay.id, patch)}
+            onChange={(patch: Partial<WorkoutDay>) =>
+              patchDay(selectedDay.id, patch)
+            }
           />
         ) : (
           <RestDayEditor
             value={selectedDay}
-            onChange={(patch) => patchDay(selectedDay.id, patch)}
+            onChange={(patch: Partial<RestDay>) =>
+              patchDay(selectedDay.id, patch)
+            }
           />
         )}
-
-        {/* Footer buttons */}
-        <View style={{ flexDirection: "row", gap: 10, paddingBottom: 12 }}>
-          <View style={{ flex: 1 }}>
-            <Button
-              title="Back"
-              variant="ghost"
-              onPress={() => router.back()}
-              fullWidth
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Button
-              title="Save"
-              variant="primary"
-              onPress={() => router.back()}
-              fullWidth
-            />
-          </View>
-        </View>
       </ScrollView>
+      {/* Footer buttons */}
+      <View
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          paddingHorizontal: 16,
+          paddingTop: 10,
+          paddingBottom: Math.max(insets.bottom, 12),
+          backgroundColor: surface,
+          borderTopWidth: 1,
+          borderTopColor: outline,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <View style={{ flex: 1 }}>
+          <Button
+            title="Back"
+            variant="ghost"
+            onPress={() => router.back()}
+            fullWidth
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Button
+            title="Save"
+            variant="primary"
+            onPress={() => router.back()}
+            fullWidth
+          />
+        </View>
+      </View>
     </SafeAreaView>
   );
 }

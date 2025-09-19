@@ -414,9 +414,7 @@ const ExerciseRow: React.FC<{
                   label=""
                   value={st.reps}
                   onChange={(n) => patchSet(st.id, { reps: n })}
-                  min={1}
                   max={99}
-                  step={1}
                 />
               </View>
 
@@ -428,7 +426,6 @@ const ExerciseRow: React.FC<{
                   onChange={(n) => patchSet(st.id, { rest: n })}
                   min={0}
                   max={600}
-                  step={5}
                   unit="s"
                 />
               </View>

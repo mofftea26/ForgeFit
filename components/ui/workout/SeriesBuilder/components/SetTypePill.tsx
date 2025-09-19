@@ -1,17 +1,23 @@
-import { SetTypes } from "@/entities/program/constants";
-import type { SetType } from "@/entities/program/types";
-import { useThemeColor } from "@/hooks/use-theme-color";
 import * as Haptics from "expo-haptics";
 import { Image as ImageIcon } from "lucide-react-native";
 import React from "react";
-import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-type Props = {
+import { SetTypes } from "@/entities/program/constants";
+import type { SetType } from "@/entities/program/types";
+import { useThemeColor } from "@/hooks/use-theme-color";
+
+export const SetTypePill: React.FC<{
   value: SetType;
   onChange: (v: SetType) => void;
-};
-
-export const SetTypePill: React.FC<Props> = ({ value, onChange }) => {
+}> = ({ value, onChange }) => {
   const outline = useThemeColor({}, "outline");
   const tint = useThemeColor({}, "primarySoft");
   const text = useThemeColor({}, "text");
@@ -20,6 +26,7 @@ export const SetTypePill: React.FC<Props> = ({ value, onChange }) => {
   const muted = useThemeColor({}, "muted");
 
   const [open, setOpen] = React.useState(false);
+
   const CurrentIcon = SetTypes[value]?.icon ?? ImageIcon;
 
   return (
@@ -103,6 +110,19 @@ export const SetTypePill: React.FC<Props> = ({ value, onChange }) => {
                 );
               })}
             </ScrollView>
+            <View style={{ height: 8 }} />
+            <Pressable
+              onPress={() => setOpen(false)}
+              style={{
+                padding: 12,
+                alignItems: "center",
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: sheetOutline,
+              }}
+            >
+              <Text style={{ color: text, fontWeight: "600" }}>Close</Text>
+            </Pressable>
           </View>
         </View>
       </Modal>

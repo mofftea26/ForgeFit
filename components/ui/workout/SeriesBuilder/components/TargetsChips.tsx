@@ -2,13 +2,11 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 
-type Props = {
+export const TargetsChips: React.FC<{
   options: string[];
   value: string[];
   onToggle: (val: string) => void;
-};
-
-export const TargetsChips: React.FC<Props> = ({ options, value, onToggle }) => {
+}> = ({ options, value, onToggle }) => {
   const outline = useThemeColor({}, "outline");
   const tint = useThemeColor({}, "primarySoft");
   const text = useThemeColor({}, "text");

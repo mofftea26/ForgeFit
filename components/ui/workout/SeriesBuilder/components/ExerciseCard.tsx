@@ -25,7 +25,7 @@ import type { SetType } from "@/entities/program/types";
 import type { Exercise } from "@/entities/program/zod";
 import { useExerciseOps } from "../hooks/useExerciseOps";
 import { SetTypePill } from "./SetTypePill";
-import { TargetsChips } from "./TargetChips";
+import { TargetsChips } from "./TargetsChips";
 
 type Props = {
   code: string; // e.g., "A1"
@@ -215,7 +215,6 @@ export const ExerciseCard: React.FC<Props> = ({
                   onChange={(n) => patchSet(st.id, { reps: n })}
                   min={1}
                   max={99}
-                  step={1}
                 />
               </View>
 
@@ -226,7 +225,6 @@ export const ExerciseCard: React.FC<Props> = ({
                   onChange={(n) => patchSet(st.id, { rest: n })}
                   min={0}
                   max={600}
-                  step={5}
                   unit="s"
                 />
               </View>

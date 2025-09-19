@@ -5,18 +5,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { ScrollView, View } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { RestDay, WorkoutDay } from "@/entities/program/zod";
-import {
-  DayList,
-  PhaseBar,
-  RestDayEditor,
-  WorkoutDayEditor,
-} from "./components";
+import { PhaseBar, RestDayEditor, WorkoutDayEditor } from "./components";
+import { DaysPanel } from "./components/DaysPanel";
+import { FooterBar } from "./components/FooterBar";
+import { summaryLabel } from "./helpers/summary";
+import { useEstimatedDuration } from "./hooks/useEstimateDuration";
 import { useProgramEditor } from "./hooks/useProgramEditor";
 
 export function ProgramEditorScreen() {
@@ -24,18 +20,14 @@ export function ProgramEditorScreen() {
     id,
     phase: qPhase,
     day: qDay,
-  } = useLocalSearchParams<{
-    id: string;
-    phase?: string;
-    day?: string;
-  }>();
+  } = useLocalSearchParams<{ id: string; phase?: string; day?: string }>();
+
   const bg = useThemeColor({}, "background");
   const outline = useThemeColor({}, "outline");
   const text = useThemeColor({}, "text");
-  const primary = useThemeColor({}, "primary");
   const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const surface = useThemeColor({}, "surface");
+
+  // Hook 1: program/editor state (always called)
   const {
     program,
     phase,
@@ -50,6 +42,25 @@ export function ProgramEditorScreen() {
     patchDay,
   } = useProgramEditor(id, qPhase, qDay);
 
+  // Prepare inputs for the next hook in an unconditional way
+  const isWorkout = selectedDay?.type === "workout";
+  const seriesForEstimate = (
+    isWorkout ? (selectedDay as WorkoutDay).series : []
+  ) as any[];
+
+  // Hook 2: duration estimate (always called, even if program is missing)
+  const { minutes: estimatedMinutesRaw } = useEstimatedDuration(
+    seriesForEstimate,
+    { perSetOverheadSec: 8, roundToMinutes: 5 }
+  );
+  const estimatedMinutes = isWorkout ? estimatedMinutesRaw : undefined;
+
+  // Build summary text (no hooks here, just plain logic)
+  const summaryText = isWorkout
+    ? summaryLabel(((selectedDay as WorkoutDay)?.series ?? []) as any)
+    : "Rest day";
+
+  // Only now do the early return
   if (!program) {
     return (
       <SafeAreaView
@@ -89,8 +100,9 @@ export function ProgramEditorScreen() {
       </View>
 
       <View style={{ height: 1, backgroundColor: outline, opacity: 0.6 }} />
+
       <ScrollView
-        contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 80 }}
+        contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 120 }}
       >
         {/* Phase bar */}
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
@@ -113,7 +125,7 @@ export function ProgramEditorScreen() {
         </View>
 
         {/* Day list */}
-        <DayList
+        <DaysPanel
           days={phase.days}
           selectedId={selectedDay?.id}
           onSelect={setSelectedDayId}
@@ -121,61 +133,34 @@ export function ProgramEditorScreen() {
           onAddRest={addRestDay}
           onRemoveDay={removeDay}
         />
-
         <View style={{ height: 1, backgroundColor: outline, opacity: 0.6 }} />
 
         {/* Editors */}
-        {selectedDay?.type === "workout" ? (
+        {isWorkout ? (
           <WorkoutDayEditor
-            value={selectedDay}
+            value={selectedDay as WorkoutDay}
             onChange={(patch: Partial<WorkoutDay>) =>
-              patchDay(selectedDay.id, patch)
+              patchDay((selectedDay as WorkoutDay).id, patch)
             }
           />
         ) : (
           <RestDayEditor
-            value={selectedDay}
+            value={selectedDay as RestDay}
             onChange={(patch: Partial<RestDay>) =>
-              patchDay(selectedDay.id, patch)
+              patchDay((selectedDay as RestDay).id, patch)
             }
           />
         )}
       </ScrollView>
-      {/* Footer buttons */}
-      <View
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          paddingHorizontal: 16,
-          paddingTop: 10,
-          paddingBottom: Math.max(insets.bottom, 12),
-          backgroundColor: surface,
-          borderTopWidth: 1,
-          borderTopColor: outline,
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 10,
-        }}
-      >
-        <View style={{ flex: 1 }}>
-          <Button
-            title="Back"
-            variant="ghost"
-            onPress={() => router.back()}
-            fullWidth
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Button
-            title="Save"
-            variant="primary"
-            onPress={() => router.back()}
-            fullWidth
-          />
-        </View>
-      </View>
+
+      {/* Sticky footer with summary + estimated duration + Save */}
+      <FooterBar
+        summaryText={summaryText}
+        estimatedMinutes={estimatedMinutes}
+        onSave={() => router.back()}
+      />
     </SafeAreaView>
   );
 }
+
+export default ProgramEditorScreen;

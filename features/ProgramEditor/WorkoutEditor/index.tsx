@@ -1,36 +1,33 @@
-import React from "react";
-import { View } from "react-native";
-
-import { TextArea } from "@/components/ui/forms/TextArea";
 import { SeriesBuilder } from "@/components/ui/workout/SeriesBuilder";
 import type { WorkoutDay } from "@/entities/program/zod";
-import { summaryLabel } from "../helpers/summary";
-
-import { BannerImage } from "./components/BannerImage";
+import React from "react";
+import { View } from "react-native";
+import { useEstimatedDuration } from "../hooks/useEstimateDuration";
 import { MetaRow } from "./components/MetaRow";
-import { ReadOnlySummary } from "./components/ReadOnlySummary";
-
 import { equipmentOptions } from "./options/equipmentOptions";
 import { muscleOptions } from "./options/muscleOptions";
-
 export const WorkoutDayEditor: React.FC<{
   value: WorkoutDay & { imageUrl?: string };
   onChange: (patch: Partial<WorkoutDay & { imageUrl?: string }>) => void;
 }> = ({ value, onChange }) => {
-  const summary = summaryLabel(value.series);
+  // Compute and sync estimated duration (keeps cards/other UI consistent)
+  const { minutes: estimatedMinutes } = useEstimatedDuration(
+    value.series as any,
+    { perSetOverheadSec: 8, roundToMinutes: 5 }
+  );
+
+  React.useEffect(() => {
+    if (value.durationMin !== estimatedMinutes) {
+      onChange({ durationMin: estimatedMinutes });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [estimatedMinutes]);
 
   return (
     <View style={{ gap: 12 }}>
-      <BannerImage
-        uri={value.imageUrl}
-        onPick={(uri: string) => onChange({ imageUrl: uri })}
-      />
-
       <MetaRow
         title={value.title}
-        durationMin={value.durationMin}
         onTitleChange={(t: string) => onChange({ title: t })}
-        onDurationChange={(n: number) => onChange({ durationMin: n })}
         targetMuscles={value.targetMuscleGroups}
         onTargetsChange={(list: string[]) =>
           onChange({ targetMuscleGroups: list as string[] })
@@ -41,14 +38,8 @@ export const WorkoutDayEditor: React.FC<{
         }
         muscleOptions={muscleOptions}
         equipmentOptions={equipmentOptions}
-      />
-
-      <ReadOnlySummary text={summary} />
-
-      <TextArea
-        label="Description"
-        value={value.description}
-        onChangeText={(t) => onChange({ description: t })}
+        description={value.description}
+        onDescriptionChange={(t: string) => onChange({ description: t })}
       />
 
       <SeriesBuilder

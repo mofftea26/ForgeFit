@@ -1,6 +1,7 @@
+import { P } from "@/components/ui/Typography";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 export const ChipCapsule: React.FC<{ label: string }> = ({ label }) => {
   const outline = useThemeColor({}, "outline");
@@ -18,7 +19,7 @@ export const ChipCapsule: React.FC<{ label: string }> = ({ label }) => {
         backgroundColor: surfaceElevated,
       }}
     >
-      <Text style={{ color: text, fontSize: 12 }}>{label}</Text>
+      <P style={{ color: text, fontSize: 12 }}>{label}</P>
     </View>
   );
 };

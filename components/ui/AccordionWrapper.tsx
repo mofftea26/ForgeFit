@@ -19,6 +19,9 @@ type Props = {
   children: React.ReactNode;
 };
 
+const CONTENT_TOP_PAD = 8;
+const HEIGHT_BUFFER = 2; // <- prevents the last line from clipping due to rounding
+
 export const AccordionWrapper: React.FC<Props> = ({
   title,
   Icon,
@@ -29,19 +32,18 @@ export const AccordionWrapper: React.FC<Props> = ({
   const surface = useThemeColor({}, "surface");
   const text = useThemeColor({}, "text");
 
-  // open state (children always mounted)
   const [open, setOpen] = React.useState(!!defaultOpen);
 
-  // animation drivers
+  // anim drivers
   const progress = useSharedValue(defaultOpen ? 1 : 0); // 0..1 (height/opacity/slide)
   const arrow = useSharedValue(defaultOpen ? 1 : 0); // 0..1 (rotation)
-  const measuredH = useSharedValue(0); // measured content height
+  const measuredH = useSharedValue(0); // content height in SAME padding context
 
   const toggle = () => {
     const to = open ? 0 : 1;
     setOpen(!open);
     progress.value = withTiming(to, {
-      duration: to ? 460 : 380, // calmer, smoother
+      duration: to ? 460 : 380,
       easing: to ? Easing.out(Easing.cubic) : Easing.in(Easing.cubic),
     });
     arrow.value = withTiming(to, {
@@ -50,9 +52,12 @@ export const AccordionWrapper: React.FC<Props> = ({
     });
   };
 
-  // Animated styles
   const contentStyle = useAnimatedStyle(() => ({
-    height: measuredH.value * progress.value, // dynamic height
+    height: Math.max(
+      0,
+      measuredH.value * progress.value +
+        (progress.value > 0 ? HEIGHT_BUFFER : 0)
+    ),
     opacity: progress.value,
     transform: [{ translateY: interpolate(progress.value, [0, 1], [-10, 0]) }],
     overflow: "hidden",
@@ -69,12 +74,12 @@ export const AccordionWrapper: React.FC<Props> = ({
         borderColor: outline,
         backgroundColor: surface,
         borderRadius: 12,
-        paddingHorizontal: 12,
+        paddingHorizontal: 12, // <- visible content lives inside this padding
         paddingTop: 10,
         paddingBottom: 8,
       }}
     >
-      {/* Header (tone matches InfoSection text) */}
+      {/* Header */}
       <Pressable
         onPress={toggle}
         style={{
@@ -94,30 +99,36 @@ export const AccordionWrapper: React.FC<Props> = ({
 
       {/* Animated container (children always mounted) */}
       <Animated.View style={contentStyle}>
-        <View style={{ paddingTop: 8 }}>{children}</View>
+        {/* IMPORTANT: same paddingTop as the measurer below */}
+        <View style={{ paddingTop: CONTENT_TOP_PAD }}>{children}</View>
       </Animated.View>
 
-      {/* Hidden measurer: ALWAYS outside the collapsing view */}
+      {/* Hidden measurer: SAME padding context & width as visible content */}
       <View
-        collapsable={false} // required on Android to measure
         pointerEvents="none"
         style={{
           position: "absolute",
-          left: 0,
-          right: 0,
+          left: 12, // <- match paddingHorizontal of the parent container
+          right: 12, // <- match paddingHorizontal of the parent container
           opacity: 0,
           zIndex: -1,
         }}
-        onLayout={(e) => {
-          const h = e.nativeEvent.layout.height;
-          // Smoothly adapt when content length changes (even while open)
-          measuredH.value = withTiming(h, {
-            duration: 300,
-            easing: Easing.out(Easing.cubic),
-          });
-        }}
       >
-        <View style={{ paddingTop: 8 }}>{children}</View>
+        <View
+          // must be on the inner view to avoid Android collapsing optimization
+          collapsable={false}
+          onLayout={(e) => {
+            const h = e.nativeEvent.layout.height;
+            // animate changes even when open (chip wraps, etc.)
+            measuredH.value = withTiming(h, {
+              duration: 260,
+              easing: Easing.out(Easing.cubic),
+            });
+          }}
+          style={{ paddingTop: CONTENT_TOP_PAD }}
+        >
+          {children}
+        </View>
       </View>
     </View>
   );

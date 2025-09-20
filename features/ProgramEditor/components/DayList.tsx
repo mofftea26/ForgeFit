@@ -1,8 +1,9 @@
+import { P } from "@/components/ui/Typography";
 import { Day } from "@/entities/program/zod";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 export const DayList: React.FC<{
   days: Day[];
@@ -33,9 +34,9 @@ export const DayList: React.FC<{
             alignItems: "center",
           }}
         >
-          <Text style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
+          <P style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
             + Workout day
-          </Text>
+          </P>
         </Pressable>
         <Pressable
           onPress={onAddRest}
@@ -48,9 +49,9 @@ export const DayList: React.FC<{
             alignItems: "center",
           }}
         >
-          <Text style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
+          <P style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
             + Rest day
-          </Text>
+          </P>
         </Pressable>
       </View>
 
@@ -78,7 +79,7 @@ export const DayList: React.FC<{
             >
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <View style={{ flex: 1 }}>
-                  <Text
+                  <P
                     style={{
                       color: active ? "#fff" : text,
                       fontFamily: "WorkSans_600SemiBold",
@@ -88,14 +89,14 @@ export const DayList: React.FC<{
                     {d.type === "workout"
                       ? d.title || `Day ${idx + 1}`
                       : "Rest"}
-                  </Text>
-                  <Text
+                  </P>
+                  <P
                     style={{ color: active ? "#fff" : muted, fontSize: 12 }}
                     numberOfLines={1}
                   >
                     {d.type}
                     {d.type === "workout" ? ` • ${d.durationMin}m` : ""}
-                  </Text>
+                  </P>
                 </View>
                 <Pressable
                   onPress={() => onRemoveDay(d.id)}

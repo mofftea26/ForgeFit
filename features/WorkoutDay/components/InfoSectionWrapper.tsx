@@ -1,3 +1,4 @@
+// components/redesign/InfoRowTwoUp.tsx
 import { Dumbbell, Target } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
@@ -9,10 +10,12 @@ export const InfoSectionWrapper: React.FC<{
 }> = ({ targets = [], equipment = [] }) => {
   if (!targets.length && !equipment.length) return null;
 
+  const both = targets.length > 0 && equipment.length > 0;
+
   return (
-    <View style={{ flexDirection: "row", gap: 12 }}>
+    <View style={{ flexDirection: "row" }}>
       {!!targets.length && (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginRight: both ? 12 : 0 }}>
           <InfoSection title="Targets" Icon={Target} items={targets} />
         </View>
       )}

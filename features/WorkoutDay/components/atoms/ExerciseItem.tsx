@@ -1,12 +1,13 @@
 import { ImagePreviewModal } from "@/components/media/ImagePreviewModal";
 import { BottomSheet } from "@/components/ui/BottomSheet";
+import { P } from "@/components/ui/Typography";
 import { SetTypePill } from "@/components/ui/workout/SeriesBuilder/components/SetTypePill";
 import type { SetType } from "@/entities/program/types";
 import type { Exercise } from "@/entities/program/zod";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Hourglass, Lightbulb, Timer } from "lucide-react-native";
 import React from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, View } from "react-native";
 
 export const ExerciseItem: React.FC<{
   exercise: Exercise;
@@ -19,6 +20,7 @@ export const ExerciseItem: React.FC<{
   const surface = useThemeColor({}, "surface");
   const surfaceElevated = useThemeColor({}, "surfaceElevated");
   const tint = useThemeColor({}, "tint");
+  const primary = useThemeColor({}, "primary");
   const icon = useThemeColor({}, "icon"); // for icons
   const noteText = (exercise.trainerNote || "").trim();
   const [noteOpen, setNoteOpen] = React.useState(false);
@@ -60,19 +62,19 @@ export const ExerciseItem: React.FC<{
               justifyContent: "center",
             }}
           >
-            <Text style={{ color: tint, fontWeight: "800", fontSize: 12 }}>
+            <P style={{ color: tint, fontWeight: "800", fontSize: 12 }}>
               {code}
-            </Text>
+            </P>
           </View>
 
           {/* Title */}
           <View style={{ flex: 1 }}>
-            <Text
+            <P
               style={{ color: text, fontWeight: "800", fontSize: 15 }}
               numberOfLines={1}
             >
               {exercise.title || `Exercise ${index + 1}`}
-            </Text>
+            </P>
           </View>
 
           {/* Thumbnail (opens preview, not editable here) */}
@@ -119,7 +121,7 @@ export const ExerciseItem: React.FC<{
       <View style={{ paddingTop: 6, gap: 8 }}>
         {/* Vertical sets: compact row with balanced spacing (no wasted right space) */}
         {sets.length === 0 ? (
-          <Text style={{ color: muted, fontSize: 12 }}>No sets.</Text>
+          <P style={{ color: muted, fontSize: 12 }}>No sets.</P>
         ) : (
           sets.map((st) => (
             <View
@@ -140,9 +142,9 @@ export const ExerciseItem: React.FC<{
               <SetTypePill value={st.type as SetType} mode="info" />
 
               {/* reps (takes available space) */}
-              <Text style={{ color: text, fontWeight: "600", flexShrink: 1 }}>
+              <P style={{ color: text, fontWeight: "600", flexShrink: 1 }}>
                 Reps {st.reps}
-              </Text>
+              </P>
 
               {/* right-side rest (tight, no extra whitespace) */}
               <View
@@ -154,9 +156,7 @@ export const ExerciseItem: React.FC<{
                 }}
               >
                 <Timer size={14} color={muted} />
-                <Text style={{ color: text, fontWeight: "600" }}>
-                  {st.rest}s
-                </Text>
+                <P style={{ color: text, fontWeight: "600" }}>{st.rest}s</P>
               </View>
             </View>
           ))
@@ -170,6 +170,10 @@ export const ExerciseItem: React.FC<{
           alignItems: "center",
           gap: 8,
           marginTop: 2,
+          borderWidth: 1,
+          borderColor: outline,
+          borderRadius: 10,
+          padding: 8,
         }}
       >
         <Pressable
@@ -192,8 +196,10 @@ export const ExerciseItem: React.FC<{
           )}
         </Pressable>
 
-        <Text style={{ color: muted, fontSize: 12 }}>Tempo</Text>
-        <Text style={{ color: text, fontWeight: "700" }}>{tempoString}</Text>
+        <P style={{ color: primary, fontSize: 12 }}>Tempo</P>
+        <P style={{ color: primary, fontSize: 12, marginLeft: "auto" }}>
+          {tempoString}
+        </P>
       </View>
 
       <BottomSheet

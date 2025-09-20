@@ -1,7 +1,8 @@
+import { P } from "@/components/ui/Typography";
 import { Phase } from "@/entities/program/zod";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 export const PhaseBar: React.FC<{
   phases: Phase[];
@@ -43,14 +44,14 @@ export const PhaseBar: React.FC<{
                 backgroundColor: active ? tint : "transparent",
               }}
             >
-              <Text
+              <P
                 style={{
                   color: active ? "#fff" : text,
                   fontFamily: "WorkSans_600SemiBold",
                 }}
               >
                 {p.title || `Phase ${i + 1}`}
-              </Text>
+              </P>
             </Pressable>
           );
         })}

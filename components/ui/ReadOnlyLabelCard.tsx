@@ -1,8 +1,9 @@
+import { P } from "@/components/ui/Typography";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
-export const ReadOnlySummary: React.FC<{ text: string }> = ({ text }) => {
+export const ReadOnlyLabelCard: React.FC<{ text: string }> = ({ text }) => {
   const outline = useThemeColor({}, "outline");
   const bg = useThemeColor({}, "surface");
   const muted = useThemeColor({}, "muted");
@@ -22,8 +23,8 @@ export const ReadOnlySummary: React.FC<{ text: string }> = ({ text }) => {
         justifyContent: "space-between",
       }}
     >
-      <Text style={{ color: muted }}>{text}</Text>
-      <Text style={{ color: primary, fontWeight: "600" }}>Read-only</Text>
+      <P style={{ color: muted }}>{text}</P>
+      <P style={{ color: primary, fontWeight: "600" }}>Read-only</P>
     </View>
   );
 };

@@ -124,7 +124,7 @@ export function ProgramEditorScreen() {
           />
         </View>
 
-        {/* Day list */}
+        {/* Day Panel */}
         <DaysPanel
           days={phase.days}
           selectedId={selectedDay?.id}
@@ -132,7 +132,14 @@ export function ProgramEditorScreen() {
           onAddWorkout={addWorkoutDay}
           onAddRest={addRestDay}
           onRemoveDay={removeDay}
+          onChangeDayImage={(dayId, uri) => {
+            const d = phase.days.find((d) => d.id === dayId);
+            if (d?.type !== "workout") return;
+
+            patchDay(dayId, { imageUrl: uri } as any);
+          }}
         />
+
         <View style={{ height: 1, backgroundColor: outline, opacity: 0.6 }} />
 
         {/* Editors */}

@@ -1,8 +1,9 @@
+import { P } from "@/components/ui/Typography";
 import { Phase, WorkoutDay } from "@/entities/program/zod";
 import { workoutDaySummary } from "@/features/ProgramEditor/helpers/summary";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 export const PhaseExerciseList: React.FC<{ phase: Phase }> = ({ phase }) => {
   const surface = useThemeColor({}, "surface");
@@ -17,9 +18,9 @@ export const PhaseExerciseList: React.FC<{ phase: Phase }> = ({ phase }) => {
 
   if (workouts.length === 0) {
     return (
-      <Text style={{ color: muted, fontFamily: "WorkSans_400Regular" }}>
+      <P style={{ color: muted, fontFamily: "WorkSans_400Regular" }}>
         No workout days in this phase yet.
-      </Text>
+      </P>
     );
   }
 
@@ -37,34 +38,32 @@ export const PhaseExerciseList: React.FC<{ phase: Phase }> = ({ phase }) => {
             gap: 6,
           }}
         >
-          <Text
-            style={{ color: text, fontFamily: "Syne_700Bold", fontSize: 16 }}
-          >
+          <P style={{ color: text, fontFamily: "Syne_700Bold", fontSize: 16 }}>
             {d.title}{" "}
-            <Text style={{ color: muted, fontFamily: "WorkSans_400Regular" }}>
+            <P style={{ color: muted, fontFamily: "WorkSans_400Regular" }}>
               • {d.durationMin} min
-            </Text>
-          </Text>
+            </P>
+          </P>
 
           {/* 🔹 NEW: read-only day summary */}
-          <Text style={{ color: muted, fontFamily: "WorkSans_400Regular" }}>
+          <P style={{ color: muted, fontFamily: "WorkSans_400Regular" }}>
             {workoutDaySummary(d)}
-          </Text>
+          </P>
 
           {d.series.length === 0 ? (
-            <Text style={{ color: muted }}>No exercises yet.</Text>
+            <P style={{ color: muted }}>No exercises yet.</P>
           ) : (
             <View style={{ gap: 6 }}>
               {d.series.map((s) => (
                 <View key={s.id} style={{ gap: 4 }}>
-                  <Text
+                  <P
                     style={{
                       color: primary,
                       fontFamily: "WorkSans_600SemiBold",
                     }}
                   >
                     Series {s.label}
-                  </Text>
+                  </P>
 
                   {s.items.map((ex, ei) => {
                     const repsDisplay =
@@ -74,7 +73,7 @@ export const PhaseExerciseList: React.FC<{ phase: Phase }> = ({ phase }) => {
                     const tempoDisplay = ex.tempo.join("/");
 
                     return (
-                      <Text
+                      <P
                         key={ex.id}
                         style={{
                           color: text,
@@ -83,10 +82,10 @@ export const PhaseExerciseList: React.FC<{ phase: Phase }> = ({ phase }) => {
                         numberOfLines={1}
                       >
                         {`${s.label}${ei + 1}`} • {ex.title || "Untitled"}{" "}
-                        <Text style={{ color: muted }}>
+                        <P style={{ color: muted }}>
                           ({repsDisplay} reps, tempo {tempoDisplay})
-                        </Text>
-                      </Text>
+                        </P>
+                      </P>
                     );
                   })}
                 </View>

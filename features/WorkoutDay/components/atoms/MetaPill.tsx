@@ -1,6 +1,7 @@
+import { P } from "@/components/ui/Typography";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 export const MetaPill: React.FC<{
   text: string;
@@ -28,18 +29,16 @@ export const MetaPill: React.FC<{
           backgroundColor: chipOnTintBg,
         }}
       >
-        <Text style={{ color: onTint, fontWeight: "700", fontSize: 12 }}>
-          {text}
-        </Text>
+        <P style={{ color: onTint, fontWeight: "700", fontSize: 12 }}>{text}</P>
       </View>
     );
   }
 
   return (
     <View style={{ ...base, borderColor: outline }}>
-      <Text style={{ color: textColor, fontWeight: "600", fontSize: 12 }}>
+      <P style={{ color: textColor, fontWeight: "600", fontSize: 12 }}>
         {text}
-      </Text>
+      </P>
     </View>
   );
 };

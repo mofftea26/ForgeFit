@@ -1,16 +1,10 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React, { useMemo, useState } from "react";
-import {
-  FlatList,
-  Modal,
-  Platform,
-  Pressable,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, Modal, Platform, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
+import { TextField } from "./TextField";
 
 export type SelectOption<T extends string | number> = {
   label: string;
@@ -115,7 +109,7 @@ export function SelectField<T extends string | number>({
             }}
           />
           {searchable ? (
-            <TextInput
+            <TextField
               placeholder="Search…"
               placeholderTextColor={muted}
               value={q}

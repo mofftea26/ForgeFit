@@ -1,7 +1,9 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React, { useEffect, useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { View } from "react-native";
+import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
+import { TextField } from "./TextField";
 
 export type NumberInputProps = Omit<FieldProps, "children"> & {
   value?: number; // allow undefined when blank
@@ -67,7 +69,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
           paddingVertical: 6,
         }}
       >
-        <TextInput
+        <TextField
           value={internal}
           onChangeText={handleChange}
           keyboardType="numeric"
@@ -83,9 +85,9 @@ export const NumberInput: React.FC<NumberInputProps> = ({
           placeholderTextColor={muted}
         />
         {unit ? (
-          <Text style={{ color: muted, fontFamily: "WorkSans_600SemiBold" }}>
+          <P style={{ color: muted, fontFamily: "WorkSans_600SemiBold" }}>
             {unit}
-          </Text>
+          </P>
         ) : null}
       </View>
     </Field>

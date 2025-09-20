@@ -1,8 +1,9 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Pressable, TextInput, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
+import { TextField } from "./TextField";
 
 export type RepsSetsFieldProps = Omit<FieldProps, "children"> & {
   value: number[]; // e.g. [12,12,10,10]
@@ -64,7 +65,7 @@ export const RepsSetsField: React.FC<RepsSetsFieldProps> = ({
             <P style={{ color: muted, fontFamily: "WorkSans_600SemiBold" }}>
               Set {i + 1}
             </P>
-            <TextInput
+            <TextField
               value={String(val ?? "")}
               onChangeText={(t) => setAt(i, t)}
               keyboardType="number-pad"

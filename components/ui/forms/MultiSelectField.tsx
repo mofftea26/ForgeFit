@@ -1,10 +1,11 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
-import { FlatList, Modal, Pressable, TextInput, View } from "react-native";
+import { FlatList, Modal, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
+import { TextField } from "./TextField";
 
 export type MultiOption<T extends string | number> = {
   label: string;
@@ -116,7 +117,7 @@ export function MultiSelectField<T extends string | number>({
             }}
           />
           {searchable ? (
-            <TextInput
+            <TextField
               placeholder="Search…"
               placeholderTextColor={muted}
               value={q}

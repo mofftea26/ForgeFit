@@ -1,8 +1,9 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React, { useState } from "react";
-import { Pressable, TextInput, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
+import { TextField } from "./TextField";
 
 export type TagPickerProps = Omit<FieldProps, "children"> & {
   value: string[];
@@ -52,7 +53,7 @@ export const TagPicker: React.FC<TagPickerProps> = ({
           backgroundColor: bg,
         }}
       >
-        <TextInput
+        <TextField
           value={draft}
           onChangeText={setDraft}
           onSubmitEditing={add}

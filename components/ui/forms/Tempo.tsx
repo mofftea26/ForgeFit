@@ -1,10 +1,11 @@
 import { Info } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
-import { Modal, Pressable, TextInput, View } from "react-native";
+import { Modal, Pressable, View } from "react-native";
 
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { H3, P } from "../Typography";
 import { Field, type FieldProps } from "./Field";
+import { TextField } from "./TextField";
 
 type TempoTuple = [string, string, string, string];
 
@@ -49,7 +50,7 @@ export const TempoInputs: React.FC<TempoInputsProps> = ({
     index: 0 | 1 | 2 | 3;
     placeholder?: string;
   }> = ({ index, placeholder }) => (
-    <TextInput
+    <TextField
       value={value[index]}
       onChangeText={(t) => setAt(index, t)}
       // default keyboard so 'X' is typeable on both platforms

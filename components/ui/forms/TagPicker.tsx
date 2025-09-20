@@ -1,6 +1,7 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React, { useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
+import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
 
 export type TagPickerProps = Omit<FieldProps, "children"> & {
@@ -83,15 +84,13 @@ export const TagPicker: React.FC<TagPickerProps> = ({
               paddingVertical: 6,
             }}
           >
-            <Text style={{ color: "#fff", fontFamily: "WorkSans_600SemiBold" }}>
+            <P style={{ color: "#fff", fontFamily: "WorkSans_600SemiBold" }}>
               {t}
-            </Text>
+            </P>
             <Pressable onPress={() => remove(t)}>
-              <Text
-                style={{ color: "#fff", fontFamily: "WorkSans_600SemiBold" }}
-              >
+              <P style={{ color: "#fff", fontFamily: "WorkSans_600SemiBold" }}>
                 ×
-              </Text>
+              </P>
             </Pressable>
           </View>
         ))}

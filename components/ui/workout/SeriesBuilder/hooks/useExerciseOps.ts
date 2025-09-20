@@ -1,65 +1,71 @@
 import type { SetType } from "@/entities/program/types";
 import type { Exercise } from "@/entities/program/zod";
-import * as Haptics from "expo-haptics";
-import * as ImagePicker from "expo-image-picker";
-import React from "react";
-import { rid } from "../utils/id";
+import { useCallback, useMemo, useState } from "react";
+import { useHaptics } from "../../../../../hooks/useHaptics";
+import { cloneLastSetDefaults } from "../utils/sets";
+import { useImagePicker } from "./useImagePicker";
 
 export function useExerciseOps(
   ex: Exercise,
   onPatch: (p: Partial<Exercise>) => void
 ) {
-  const [noteOpen, setNoteOpen] = React.useState(false);
-  const [titleHeight, setTitleHeight] = React.useState(52);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [titleHeight, setTitleHeight] = useState(52);
+  const { light, select } = useHaptics();
+  const { pickImage: pickImageRaw } = useImagePicker();
 
-  const setTitleMeasuredHeight = (h: number) =>
-    setTitleHeight(Math.max(44, Math.round(h)));
+  const setTitleMeasuredHeight = useCallback(
+    (h: number) => setTitleHeight(Math.max(44, Math.round(h))),
+    []
+  );
 
-  async function pickImage() {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") return;
-    const res = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.85,
-    });
-    if (!res.canceled && res.assets?.[0]?.uri) {
-      onPatch({ imageUrl: res.assets[0].uri });
-      await Haptics.selectionAsync();
-    }
-  }
+  const pickImage = useCallback(async () => {
+    const uri = await pickImageRaw();
+    if (!uri) return;
+    onPatch({ imageUrl: uri });
+    await select();
+  }, [onPatch, pickImageRaw, select]);
 
-  async function addSet() {
-    onPatch({
-      sets: [
-        ...(ex.sets ?? []),
-        { id: rid(), type: "working" as SetType, reps: 10, rest: 60 },
-      ],
-    });
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }
+  const addSet = useCallback(async () => {
+    const next = cloneLastSetDefaults(ex);
+    onPatch({ sets: [...(ex.sets ?? []), next] });
+    await light();
+  }, [ex, onPatch, light]);
 
-  async function removeSet(setId: string) {
-    onPatch({ sets: (ex.sets ?? []).filter((s) => s.id !== setId) });
-    await Haptics.selectionAsync();
-  }
+  const removeSet = useCallback(
+    async (setId: string) => {
+      onPatch({ sets: (ex.sets ?? []).filter((s) => s.id !== setId) });
+      await select();
+    },
+    [ex.sets, onPatch, select]
+  );
 
-  async function patchSet(
-    setId: string,
-    patch: Partial<{ type: SetType; reps: number; rest: number }>
-  ) {
-    onPatch({
-      sets: (ex.sets ?? []).map((s) =>
-        s.id === setId ? { ...s, ...patch } : s
-      ),
-    });
-    await Haptics.selectionAsync();
-  }
+  const patchSet = useCallback(
+    async (
+      setId: string,
+      patch: Partial<{ type: SetType; reps: number; rest: number }>
+    ) => {
+      onPatch({
+        sets: (ex.sets ?? []).map((s) =>
+          s.id === setId ? { ...s, ...patch } : s
+        ),
+      });
+      await select();
+    },
+    [ex.sets, onPatch, select]
+  );
+
+  const imageSide = useMemo(
+    () => Math.max(44, Math.round(titleHeight * 0.65)),
+    [titleHeight]
+  );
 
   return {
     noteOpen,
     setNoteOpen,
     titleHeight,
     setTitleMeasuredHeight,
+    imageSide,
     pickImage,
     addSet,
     removeSet,

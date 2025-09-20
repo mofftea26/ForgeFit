@@ -1,4 +1,5 @@
 import { ImagePreviewModal } from "@/components/media/ImagePreviewModal";
+import { P } from "@/components/ui/Typography";
 import { Day } from "@/entities/program/zod";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import * as Haptics from "expo-haptics";
@@ -10,7 +11,7 @@ import {
   Trash2,
 } from "lucide-react-native";
 import React from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, View } from "react-native";
 
 type Props = {
   days: Day[];
@@ -88,7 +89,7 @@ export const DaysPanel: React.FC<Props> = ({
           paddingHorizontal: 2,
         }}
       >
-        <Text
+        <P
           style={{
             color: text,
             fontFamily: "WorkSans_600SemiBold",
@@ -96,7 +97,7 @@ export const DaysPanel: React.FC<Props> = ({
           }}
         >
           Days
-        </Text>
+        </P>
 
         <View style={{ flex: 1 }} />
 
@@ -155,9 +156,9 @@ export const DaysPanel: React.FC<Props> = ({
           showsVerticalScrollIndicator
         >
           {days.length === 0 ? (
-            <Text style={{ color: muted, fontSize: 13 }}>
+            <P style={{ color: muted, fontSize: 13 }}>
               No days yet. Use the buttons above to add workout or rest days.
-            </Text>
+            </P>
           ) : (
             days.map((d, idx) => {
               const active = d.id === selectedId;
@@ -204,14 +205,14 @@ export const DaysPanel: React.FC<Props> = ({
                         >
                           <Moon size={18} color={muted} />
                         </View>
-                        <Text
+                        <P
                           style={{
                             color: active ? "#fff" : text,
                             fontFamily: "WorkSans_600SemiBold",
                           }}
                         >
                           Rest
-                        </Text>
+                        </P>
                       </View>
 
                       {/* Trash */}
@@ -275,7 +276,7 @@ export const DaysPanel: React.FC<Props> = ({
                     </Pressable>
 
                     <View style={{ flex: 1 }}>
-                      <Text
+                      <P
                         style={{
                           color: active ? "#fff" : text,
                           fontFamily: "WorkSans_600SemiBold",
@@ -283,7 +284,7 @@ export const DaysPanel: React.FC<Props> = ({
                         numberOfLines={1}
                       >
                         {d.title || `Day ${idx + 1}`}
-                      </Text>
+                      </P>
 
                       <View
                         style={{
@@ -292,14 +293,14 @@ export const DaysPanel: React.FC<Props> = ({
                           gap: 6,
                         }}
                       >
-                        <Text
+                        <P
                           style={{
                             color: active ? "#fff" : muted,
                             fontSize: 12,
                           }}
                         >
                           workout
-                        </Text>
+                        </P>
                         <View
                           style={{
                             flexDirection: "row",
@@ -308,14 +309,14 @@ export const DaysPanel: React.FC<Props> = ({
                           }}
                         >
                           <Timer size={13} color={active ? "#fff" : muted} />
-                          <Text
+                          <P
                             style={{
                               color: active ? "#fff" : muted,
                               fontSize: 12,
                             }}
                           >
                             {d.durationMin}m
-                          </Text>
+                          </P>
                         </View>
                       </View>
                     </View>

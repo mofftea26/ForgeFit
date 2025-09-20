@@ -1,8 +1,9 @@
+import { P } from "@/components/ui/Typography";
 import { Program } from "@/entities/program/zod";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, View } from "react-native";
 
 export const ProgramCard: React.FC<{
   program: Program;
@@ -41,7 +42,7 @@ export const ProgramCard: React.FC<{
 
       <View style={{ padding: 14 }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text
+          <P
             style={{
               color: text,
               fontFamily: "Syne_700Bold",
@@ -50,7 +51,7 @@ export const ProgramCard: React.FC<{
             }}
           >
             {program.title}
-          </Text>
+          </P>
 
           {/* 3-dots menu */}
           <Pressable
@@ -63,9 +64,9 @@ export const ProgramCard: React.FC<{
         </View>
 
         {!!program.description && (
-          <Text style={{ color: muted, marginTop: 4 }} numberOfLines={2}>
+          <P style={{ color: muted, marginTop: 4 }} numberOfLines={2}>
             {program.description}
-          </Text>
+          </P>
         )}
 
         <View style={{ flexDirection: "row", gap: 12, marginTop: 10 }}>
@@ -124,7 +125,7 @@ const Badge: React.FC<React.PropsWithChildren> = ({ children }) => {
         paddingHorizontal: 10,
       }}
     >
-      <Text
+      <P
         style={{
           color: text,
           fontFamily: "WorkSans_600SemiBold",
@@ -132,7 +133,7 @@ const Badge: React.FC<React.PropsWithChildren> = ({ children }) => {
         }}
       >
         {children}
-      </Text>
+      </P>
     </View>
   );
 };
@@ -149,14 +150,14 @@ const MenuItem: React.FC<{
       onPress={onPress}
       style={{ paddingVertical: 10, paddingHorizontal: 12 }}
     >
-      <Text
+      <P
         style={{
           color: destructive ? accentAlt : text,
           fontFamily: "WorkSans_600SemiBold",
         }}
       >
         {label}
-      </Text>
+      </P>
     </Pressable>
   );
 };

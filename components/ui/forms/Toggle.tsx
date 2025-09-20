@@ -1,6 +1,7 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Switch, Text, View, ViewStyle } from "react-native";
+import { Switch, View, ViewStyle } from "react-native";
+import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
 
 export type ToggleProps = Omit<FieldProps, "children"> & {
@@ -38,7 +39,7 @@ export const Toggle: React.FC<ToggleProps> = ({
           paddingVertical: 6,
         }}
       >
-        <Text
+        <P
           style={{
             color: text,
             fontFamily: "WorkSans_400Regular",
@@ -46,7 +47,7 @@ export const Toggle: React.FC<ToggleProps> = ({
           }}
         >
           {value ? "On" : "Off"}
-        </Text>
+        </P>
         <Switch
           trackColor={{ false: "#aaa", true: tint }}
           thumbColor={"#fff"}

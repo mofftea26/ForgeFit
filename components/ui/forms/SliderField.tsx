@@ -1,9 +1,10 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { Field, FieldProps } from "./Field";
 // install: pnpm expo install expo-slider
 import Slider from "@react-native-community/slider"; // if you use expo-slider, change import to 'expo-slider'
+import { P } from "../Typography";
 
 export type SliderFieldProps = Omit<FieldProps, "children"> & {
   value: number;
@@ -48,7 +49,7 @@ export const SliderField: React.FC<SliderFieldProps> = ({
           thumbTintColor={tint}
         />
         {showValue ? (
-          <Text
+          <P
             style={{
               color: text,
               width: 60,
@@ -58,7 +59,7 @@ export const SliderField: React.FC<SliderFieldProps> = ({
           >
             {value}
             {unit ? ` ${unit}` : ""}
-          </Text>
+          </P>
         ) : null}
       </View>
     </Field>

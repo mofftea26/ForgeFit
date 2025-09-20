@@ -1,6 +1,7 @@
+import { P } from "@/components/ui/Typography";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export const FAB: React.FC<{ onPress?: () => void }> = ({ onPress }) => {
@@ -29,7 +30,7 @@ export const FAB: React.FC<{ onPress?: () => void }> = ({ onPress }) => {
         shadowOffset: { width: 0, height: 2 },
       }}
     >
-      <Text
+      <P
         style={{
           color: bg,
           fontSize: 28,
@@ -39,7 +40,7 @@ export const FAB: React.FC<{ onPress?: () => void }> = ({ onPress }) => {
         }}
       >
         +
-      </Text>
+      </P>
     </Pressable>
   );
 };

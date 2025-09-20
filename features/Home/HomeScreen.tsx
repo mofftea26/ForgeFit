@@ -1,3 +1,4 @@
+import LogoColor from "@/assets/images/svg/logo-no-background.svg";
 import { useRouter } from "expo-router";
 import React from "react";
 import { ScrollView, View } from "react-native";
@@ -17,6 +18,7 @@ export function HomeScreen() {
   const bg = useThemeColor({}, "background");
   const text = useThemeColor({}, "text");
   const outline = useThemeColor({}, "outline");
+  const primarySoft = useThemeColor({}, "primarySoft");
   const router = useRouter();
 
   const programs = useProgramStore((s) => s.programs);
@@ -38,10 +40,31 @@ export function HomeScreen() {
           <Hero onPrimary={goCreate} />
         ) : (
           <View style={{ gap: 8 }}>
-            <View>
-              <H1 style={{ color: text }}>ForgeFit</H1>
-              <H2 color="primary">Workout Builder</H2>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
+            >
+              {/* SVG logo on the left */}
+              <View
+                style={{
+                  width: 60,
+                  height: 60,
+                  backgroundColor: "transparent",
+                  borderRadius: 10,
+                }}
+              >
+                <LogoColor
+                  width="100%"
+                  height="100%"
+                  preserveAspectRatio="xMidYMid"
+                />
+              </View>
+              {/* Texts on the right */}
+              <View>
+                <H1 style={{ color: text }}>ForgeFit</H1>
+                <H2 color="primary">Forge Yourself</H2>
+              </View>
             </View>
+
             <View
               style={{
                 height: 1,

@@ -5,11 +5,11 @@ import {
   Modal,
   Platform,
   Pressable,
-  Text,
   TextInput,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
 
 export type SelectOption<T extends string | number> = {
@@ -78,7 +78,7 @@ export function SelectField<T extends string | number>({
           justifyContent: "center",
         }}
       >
-        <Text
+        <P
           style={{
             color: selected ? text : muted,
             fontFamily: "WorkSans_400Regular",
@@ -87,7 +87,7 @@ export function SelectField<T extends string | number>({
           numberOfLines={1}
         >
           {selected ? selected.label : placeholder}
-        </Text>
+        </P>
       </Pressable>
 
       <Modal visible={open} animationType="slide" transparent>
@@ -157,7 +157,7 @@ export function SelectField<T extends string | number>({
                 >
                   {item.icon}
                   <View style={{ flex: 1 }}>
-                    <Text
+                    <P
                       style={{
                         color: active ? "#fff" : text,
                         fontFamily: "WorkSans_600SemiBold",
@@ -165,9 +165,9 @@ export function SelectField<T extends string | number>({
                       }}
                     >
                       {item.label}
-                    </Text>
+                    </P>
                     {item.description ? (
-                      <Text
+                      <P
                         style={{
                           color: active ? "#fff" : muted,
                           fontFamily: "WorkSans_400Regular",
@@ -175,7 +175,7 @@ export function SelectField<T extends string | number>({
                         }}
                       >
                         {item.description}
-                      </Text>
+                      </P>
                     ) : null}
                   </View>
                 </Pressable>
@@ -194,9 +194,9 @@ export function SelectField<T extends string | number>({
               marginBottom: safeBottom,
             }}
           >
-            <Text style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
+            <P style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
               Cancel
-            </Text>
+            </P>
           </Pressable>
         </View>
       </Modal>

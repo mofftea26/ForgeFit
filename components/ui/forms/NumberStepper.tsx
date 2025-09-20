@@ -1,6 +1,7 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
 
 export type NumberStepperProps = Omit<FieldProps, "children"> & {
@@ -51,7 +52,7 @@ export const NumberStepper: React.FC<NumberStepperProps> = ({
         opacity: disabled ? 0.5 : 1,
       }}
     >
-      <Text
+      <P
         style={{
           color: text,
           fontFamily: "WorkSans_600SemiBold",
@@ -59,7 +60,7 @@ export const NumberStepper: React.FC<NumberStepperProps> = ({
         }}
       >
         {children}
-      </Text>
+      </P>
     </Pressable>
   );
 
@@ -84,7 +85,7 @@ export const NumberStepper: React.FC<NumberStepperProps> = ({
             justifyContent: "center",
           }}
         >
-          <Text
+          <P
             style={{
               color: text,
               fontFamily: "WorkSans_600SemiBold",
@@ -92,9 +93,9 @@ export const NumberStepper: React.FC<NumberStepperProps> = ({
             }}
           >
             {value}
-          </Text>
+          </P>
           {unit ? (
-            <Text
+            <P
               style={{
                 color: primary,
                 fontFamily: "WorkSans_600SemiBold",
@@ -102,7 +103,7 @@ export const NumberStepper: React.FC<NumberStepperProps> = ({
               }}
             >
               {unit}
-            </Text>
+            </P>
           ) : null}
         </View>
         <Btn onPress={inc} disabled={value >= max}>

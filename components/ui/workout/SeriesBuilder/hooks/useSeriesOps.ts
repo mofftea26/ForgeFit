@@ -1,33 +1,39 @@
 import type { Exercise, Series } from "@/entities/program/zod";
-import * as Haptics from "expo-haptics";
+import { useCallback } from "react";
+import { useHaptics } from "../../../../../hooks/useHaptics";
 import { rid } from "../utils/id";
+import { removeById, replaceAtIndex, updateById } from "../utils/update";
+import { useAutoSeriesLabel } from "./useAutoSeriesLabel";
 
-type Args = {
-  value: Series[];
-  onChange: (next: Series[]) => void;
-};
+type Args = { value: Series[]; onChange: (next: Series[]) => void };
 
 export function useSeriesOps({ value, onChange }: Args) {
-  const bump = (next: Series[]) => onChange(next);
-  const autoSeriesLabel = (idx: number) =>
-    String.fromCharCode("A".charCodeAt(0) + idx);
+  const { light, select } = useHaptics();
+  const { fromIndex } = useAutoSeriesLabel();
 
-  async function addSeries() {
-    const label = autoSeriesLabel(value.length);
-    const nextSeries: Series = { id: rid(), label, items: [], trainerNote: "" };
-    bump([...value, nextSeries]);
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }
+  const addSeries = useCallback(async () => {
+    const nextSeries: Series = {
+      id: rid(),
+      label: fromIndex(value.length),
+      items: [],
+      trainerNote: "",
+    };
+    onChange([...value, nextSeries]);
+    await light();
+  }, [fromIndex, light, onChange, value]);
 
-  async function removeSeries(seriesId: string) {
-    bump(value.filter((s) => s.id !== seriesId));
-    await Haptics.selectionAsync();
-  }
+  const removeSeries = useCallback(
+    async (seriesId: string) => {
+      onChange(removeById(value, seriesId));
+      await select();
+    },
+    [onChange, select, value]
+  );
 
-  async function addExercise(seriesIndex: number) {
-    const next = value.map((s, i) => {
-      if (i !== seriesIndex) return s;
-      const newExercise: Exercise = {
+  const addExercise = useCallback(
+    async (seriesIndex: number) => {
+      const s = value[seriesIndex];
+      const ex: Exercise = {
         id: rid(),
         title: "",
         imageUrl: "",
@@ -36,36 +42,40 @@ export function useSeriesOps({ value, onChange }: Args) {
         targetMuscles: [],
         trainerNote: "",
       };
-      return { ...s, items: [...s.items, newExercise] };
-    });
-    bump(next);
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }
+      onChange(
+        replaceAtIndex(value, seriesIndex, { ...s, items: [...s.items, ex] })
+      );
+      await light();
+    },
+    [light, onChange, value]
+  );
 
-  function patchExercise(
-    seriesIndex: number,
-    exId: string,
-    patch: Partial<Exercise>
-  ) {
-    const next = value.map((s, i) => {
-      if (i !== seriesIndex) return s;
-      return {
-        ...s,
-        items: s.items.map((e) => (e.id === exId ? { ...e, ...patch } : e)),
-      };
-    });
-    bump(next);
-  }
+  const patchExercise = useCallback(
+    (seriesIndex: number, exId: string, patch: Partial<Exercise>) => {
+      const s = value[seriesIndex];
+      onChange(
+        replaceAtIndex(value, seriesIndex, {
+          ...s,
+          items: updateById(s.items, exId, patch),
+        })
+      );
+    },
+    [onChange, value]
+  );
 
-  async function removeExercise(seriesIndex: number, exId: string) {
-    const next = value.map((s, i) =>
-      i !== seriesIndex
-        ? s
-        : { ...s, items: s.items.filter((e) => e.id !== exId) }
-    );
-    bump(next);
-    await Haptics.selectionAsync();
-  }
+  const removeExercise = useCallback(
+    async (seriesIndex: number, exId: string) => {
+      const s = value[seriesIndex];
+      onChange(
+        replaceAtIndex(value, seriesIndex, {
+          ...s,
+          items: s.items.filter((e) => e.id !== exId),
+        })
+      );
+      await select();
+    },
+    [onChange, select, value]
+  );
 
   return {
     addSeries,
@@ -73,6 +83,6 @@ export function useSeriesOps({ value, onChange }: Args) {
     addExercise,
     patchExercise,
     removeExercise,
-    autoSeriesLabel,
+    fromIndex,
   };
 }

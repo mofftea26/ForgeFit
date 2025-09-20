@@ -1,6 +1,7 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { P } from "../Typography";
 
 export const PillChecklist: React.FC<{
   options: { label: string; value: string }[];
@@ -33,14 +34,14 @@ export const PillChecklist: React.FC<{
               backgroundColor: active ? tint : "transparent",
             }}
           >
-            <Text
+            <P
               style={{
                 color: active ? "#fff" : text,
                 fontFamily: "WorkSans_600SemiBold",
               }}
             >
               {opt.label}
-            </Text>
+            </P>
           </Pressable>
         );
       })}

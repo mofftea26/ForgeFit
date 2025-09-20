@@ -1,6 +1,7 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React from "react";
-import { Text, View, ViewStyle } from "react-native";
+import { View, ViewStyle } from "react-native";
+import { P } from "../Typography";
 
 export type FieldProps = {
   label?: string;
@@ -26,7 +27,7 @@ export const Field: React.FC<FieldProps> = ({
   return (
     <View style={[{ width: "100%" }, style]}>
       {label ? (
-        <Text
+        <P
           style={{
             color: text,
             fontFamily: "WorkSans_600SemiBold",
@@ -34,15 +35,14 @@ export const Field: React.FC<FieldProps> = ({
             marginBottom: 6,
           }}
         >
-          {label}{" "}
-          {required ? <Text style={{ color: accentAlt }}>*</Text> : null}
-        </Text>
+          {label} {required ? <P style={{ color: accentAlt }}>*</P> : null}
+        </P>
       ) : null}
 
       {children}
 
       {error ? (
-        <Text
+        <P
           style={{
             color: accentAlt,
             marginTop: 6,
@@ -51,9 +51,9 @@ export const Field: React.FC<FieldProps> = ({
           }}
         >
           {error}
-        </Text>
+        </P>
       ) : helper ? (
-        <Text
+        <P
           style={{
             color: muted,
             marginTop: 6,
@@ -62,7 +62,7 @@ export const Field: React.FC<FieldProps> = ({
           }}
         >
           {helper}
-        </Text>
+        </P>
       ) : null}
     </View>
   );

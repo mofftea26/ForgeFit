@@ -3,13 +3,15 @@ import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { Pencil, X } from "lucide-react-native";
 import React from "react";
-import { Image, Modal, Pressable, Text, View } from "react-native";
+import { Image, Modal, Pressable, View } from "react-native";
+import { P } from "../ui/Typography";
 
 type Props = {
   visible: boolean;
   uri?: string;
   onRequestClose: () => void;
   onChange?: (nextUri: string) => void;
+  isEditable?: boolean;
 };
 
 export const ImagePreviewModal: React.FC<Props> = ({
@@ -17,11 +19,15 @@ export const ImagePreviewModal: React.FC<Props> = ({
   uri,
   onRequestClose,
   onChange,
+  isEditable = true,
 }) => {
   const sheetBg = useThemeColor({}, "surface");
   const outline = useThemeColor({}, "outline");
   const text = useThemeColor({}, "text");
   const muted = useThemeColor({}, "muted");
+  const scrim = useThemeColor({}, "scrim");
+  const mediaBg = useThemeColor({}, "mediaBg");
+  const onTint = useThemeColor({}, "onTint"); // for the floating pencil
 
   const pickNewImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -41,7 +47,7 @@ export const ImagePreviewModal: React.FC<Props> = ({
       <View
         style={{
           flex: 1,
-          backgroundColor: "rgba(0,0,0,0.65)",
+          backgroundColor: scrim,
           justifyContent: "center",
           padding: 16,
         }}
@@ -66,60 +72,57 @@ export const ImagePreviewModal: React.FC<Props> = ({
               borderBottomColor: outline,
             }}
           >
-            <Text
-              style={{
-                color: text,
-                fontFamily: "Syne_700Bold", // match app headers
-                fontSize: 16,
-              }}
+            <P
+              style={{ color: text, fontFamily: "Syne_700Bold", fontSize: 16 }}
             >
               Image preview
-            </Text>
+            </P>
             <View style={{ flex: 1 }} />
             <Pressable onPress={onRequestClose} hitSlop={8}>
               <X size={18} color={muted} />
             </Pressable>
           </View>
 
-          {/* Image area with floating edit button (bottom-right) */}
+          {/* Media area */}
           <View
             style={{
               width: "100%",
               aspectRatio: 1,
-              backgroundColor: "#000",
+              backgroundColor: mediaBg,
               alignItems: "center",
               justifyContent: "center",
             }}
           >
             {uri ? (
-              <>
-                <Image
-                  source={{ uri }}
-                  style={{ width: "100%", height: "100%" }}
-                  resizeMode="contain"
-                />
-                <Pressable
-                  onPress={pickNewImage}
-                  hitSlop={8}
-                  style={{
-                    position: "absolute",
-                    right: 12,
-                    bottom: 12,
-                    width: 44,
-                    height: 44,
-                    borderRadius: 22,
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "rgba(0,0,0,0.55)",
-                    borderWidth: 1,
-                    borderColor: "rgba(255,255,255,0.25)",
-                  }}
-                >
-                  <Pencil size={18} color="#fff" />
-                </Pressable>
-              </>
+              <Image
+                source={{ uri }}
+                style={{ width: "100%", height: "100%" }}
+                resizeMode="contain"
+              />
             ) : (
-              <Text style={{ color: "#fff" }}>No image selected</Text>
+              <P style={{ color: text }}>No image selected</P>
+            )}
+
+            {isEditable && (
+              <Pressable
+                onPress={pickNewImage}
+                hitSlop={8}
+                style={{
+                  position: "absolute",
+                  right: 12,
+                  bottom: 12,
+                  width: 44,
+                  height: 44,
+                  borderRadius: 22,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: scrim,
+                  borderWidth: 1,
+                  borderColor: outline,
+                }}
+              >
+                <Pencil size={18} color={onTint} />
+              </Pressable>
             )}
           </View>
         </View>

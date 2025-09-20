@@ -1,6 +1,6 @@
 import { Info } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
-import { Modal, Pressable, Text, TextInput, View } from "react-native";
+import { Modal, Pressable, TextInput, View } from "react-native";
 
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { H3, P } from "../Typography";
@@ -74,7 +74,7 @@ export const TempoInputs: React.FC<TempoInputsProps> = ({
   );
 
   const Slash = () => (
-    <Text style={{ color: muted, fontSize: 18, marginHorizontal: 6 }}>/</Text>
+    <P style={{ color: muted, fontSize: 18, marginHorizontal: 6 }}>/</P>
   );
 
   // Info content (same tone as your SelectField modal)
@@ -100,7 +100,7 @@ export const TempoInputs: React.FC<TempoInputsProps> = ({
           marginBottom: 6,
         }}
       >
-        <Text
+        <P
           style={{
             color: text,
             fontFamily: "WorkSans_600SemiBold",
@@ -109,10 +109,8 @@ export const TempoInputs: React.FC<TempoInputsProps> = ({
           }}
         >
           {label}{" "}
-          {required ? (
-            <Text style={{ color: muted, opacity: 0.9 }}>*</Text>
-          ) : null}
-        </Text>
+          {required ? <P style={{ color: muted, opacity: 0.9 }}>*</P> : null}
+        </P>
         <View style={{ flex: 1 }} />
         <Pressable
           onPress={() => setOpenInfo(true)}
@@ -191,9 +189,9 @@ export const TempoInputs: React.FC<TempoInputsProps> = ({
               borderColor: outline,
             }}
           >
-            <Text style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
+            <P style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
               Close
-            </Text>
+            </P>
           </Pressable>
         </View>
       </Modal>

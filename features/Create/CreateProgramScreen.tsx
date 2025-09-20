@@ -94,7 +94,7 @@ export function CreateProgramScreen() {
         >
           <ScrollView
             style={{ flex: 1 }}
-            contentContainerStyle={{ paddingBottom: 40 }}
+            contentContainerStyle={{ paddingBottom: 40, gap: 12 }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
@@ -122,10 +122,7 @@ export function CreateProgramScreen() {
             <NumberInput
               label="Length (weeks)"
               value={weeks}
-              onChange={setWeeks}
-              min={1}
-              max={104}
-              step={1}
+              onChange={(v) => setWeeks(v ?? 0)}
             />
 
             <TextArea

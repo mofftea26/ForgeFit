@@ -1,6 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
 import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
 import { TextField } from "./TextField";
@@ -56,40 +55,34 @@ export const NumberInput: React.FC<NumberInputProps> = ({
 
   return (
     <Field label={label} helper={helper} error={error} required={required}>
-      <View
+      <TextField
+        value={internal}
+        onChangeText={handleChange}
+        keyboardType="numeric"
         style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 6,
-          borderWidth: 1,
-          borderColor: outline,
-          borderRadius: 12,
-          backgroundColor: surface,
-          paddingHorizontal: 8,
-          paddingVertical: 6,
+          flex: 1,
+          textAlign: "center",
+          color: text,
+          fontFamily: "WorkSans_600SemiBold",
+          fontSize: 16,
         }}
-      >
-        <TextField
-          value={internal}
-          onChangeText={handleChange}
-          keyboardType="numeric"
+        placeholder="—"
+        placeholderTextColor={muted}
+      />
+      {unit ? (
+        <P
           style={{
-            flex: 1,
-            textAlign: "center",
-            color: text,
+            color: muted,
             fontFamily: "WorkSans_600SemiBold",
-            fontSize: 16,
-            paddingVertical: 4,
+            position: "absolute",
+            right: 12,
+            top: "50%",
+            transform: [{ translateY: -10 }],
           }}
-          placeholder="—"
-          placeholderTextColor={muted}
-        />
-        {unit ? (
-          <P style={{ color: muted, fontFamily: "WorkSans_600SemiBold" }}>
-            {unit}
-          </P>
-        ) : null}
-      </View>
+        >
+          {unit}
+        </P>
+      ) : null}
     </Field>
   );
 };

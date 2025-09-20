@@ -1,7 +1,8 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React, { useMemo, useState } from "react";
-import { FlatList, Modal, Platform, Pressable, View } from "react-native";
+import { FlatList, Platform, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BottomSheet } from "../BottomSheet";
 import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
 import { TextField } from "./TextField";
@@ -84,43 +85,22 @@ export function SelectField<T extends string | number>({
         </P>
       </Pressable>
 
-      <Modal visible={open} animationType="slide" transparent>
-        <Pressable
-          onPress={() => setOpen(false)}
-          style={{ flex: 1, backgroundColor: "#0007" }}
-        />
-        <View
-          style={{
-            maxHeight: "70%",
-            backgroundColor: sheetBg,
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
-            padding: 12,
-          }}
-        >
-          <View
-            style={{
-              height: 4,
-              width: 40,
-              backgroundColor: outline,
-              borderRadius: 4,
-              alignSelf: "center",
-              marginBottom: 12,
-            }}
-          />
+      <BottomSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        scrollable={false}
+      >
+        <View style={{ gap: 12 }}>
           {searchable ? (
             <TextField
               placeholder="Search…"
               placeholderTextColor={muted}
               value={q}
               onChangeText={setQ}
-              autoFocus={Platform.OS !== "android"} // avoid auto keyboard popping weirdness
+              autoFocus={Platform.OS !== "android"}
               style={{
                 borderColor: outline,
-                borderWidth: 1,
                 borderRadius: 12,
-                paddingHorizontal: 12,
-                paddingVertical: 10,
                 marginBottom: 8,
                 color: text,
                 fontFamily: "WorkSans_400Regular",
@@ -176,24 +156,8 @@ export function SelectField<T extends string | number>({
               );
             }}
           />
-          <Pressable
-            onPress={() => setOpen(false)}
-            style={{
-              padding: 12,
-              alignItems: "center",
-              marginTop: 8,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: outline,
-              marginBottom: safeBottom,
-            }}
-          >
-            <P style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
-              Cancel
-            </P>
-          </Pressable>
         </View>
-      </Modal>
+      </BottomSheet>
     </Field>
   );
 }

@@ -1,9 +1,10 @@
 import { Info } from "lucide-react-native";
 import React, { useMemo, useState } from "react";
-import { Modal, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { H3, P } from "../Typography";
+import { BottomSheet } from "../BottomSheet";
+import { P } from "../Typography";
 import { Field, type FieldProps } from "./Field";
 import { TextField } from "./TextField";
 
@@ -50,28 +51,26 @@ export const TempoInputs: React.FC<TempoInputsProps> = ({
     index: 0 | 1 | 2 | 3;
     placeholder?: string;
   }> = ({ index, placeholder }) => (
-    <TextField
-      value={value[index]}
-      onChangeText={(t) => setAt(index, t)}
-      // default keyboard so 'X' is typeable on both platforms
-      keyboardType="default"
-      autoCapitalize="characters"
-      placeholder={placeholder}
-      placeholderTextColor={muted}
-      maxLength={2}
-      style={{
-        width: 48,
-        textAlign: "center",
-        borderWidth: 1,
-        borderColor: outline,
-        borderRadius: 10,
-        backgroundColor: surface,
-        color: text,
-        paddingVertical: 8,
-        fontFamily: "WorkSans_600SemiBold",
-        fontSize: 16,
-      }}
-    />
+    <View style={{ width: 48 }}>
+      <TextField
+        value={value[index]}
+        onChangeText={(t) => setAt(index, t)}
+        // default keyboard so 'X' is typeable on both platforms
+        keyboardType="numeric"
+        autoCapitalize="characters"
+        placeholder={placeholder}
+        placeholderTextColor={muted}
+        maxLength={2}
+        style={{
+          textAlign: "center",
+          borderColor: outline,
+          borderRadius: 10,
+          color: text,
+          fontFamily: "WorkSans_600SemiBold",
+          fontSize: 13,
+        }}
+      />
+    </View>
   );
 
   const Slash = () => (
@@ -105,11 +104,11 @@ export const TempoInputs: React.FC<TempoInputsProps> = ({
           style={{
             color: text,
             fontFamily: "WorkSans_600SemiBold",
-            fontSize: 14,
+            fontSize: 13,
             flexShrink: 1,
           }}
         >
-          {label}{" "}
+          {label}
           {required ? <P style={{ color: muted, opacity: 0.9 }}>*</P> : null}
         </P>
         <View style={{ flex: 1 }} />
@@ -123,7 +122,15 @@ export const TempoInputs: React.FC<TempoInputsProps> = ({
       </View>
 
       {/* Inputs */}
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 6,
+          width: "100%",
+        }}
+      >
         <Box index={0} placeholder="Ecc" />
         <Slash />
         <Box index={1} placeholder="Pause" />
@@ -133,69 +140,12 @@ export const TempoInputs: React.FC<TempoInputsProps> = ({
         <Box index={3} placeholder="Pause" />
       </View>
 
-      {/* Info modal */}
-      <Modal visible={openInfo} animationType="slide" transparent>
-        <Pressable
-          onPress={() => setOpenInfo(false)}
-          style={{ flex: 1, backgroundColor: "#0007" }}
-        />
-        <View
-          style={{
-            maxHeight: "60%",
-            backgroundColor: sheetBg,
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
-            padding: 12,
-          }}
-        >
-          <View
-            style={{
-              height: 4,
-              width: 40,
-              backgroundColor: outline,
-              borderRadius: 4,
-              alignSelf: "center",
-              marginBottom: 12,
-            }}
-          />
-          <H3
-            style={{
-              color: text,
-              fontFamily: "WorkSans_600SemiBold",
-              fontSize: 16,
-              marginBottom: 8,
-            }}
-          >
-            Tempo guide
-          </H3>
-          <P
-            style={{
-              color: icon,
-              fontFamily: "WorkSans_400Regular",
-              fontSize: 12,
-              lineHeight: 20,
-            }}
-          >
-            {infoText}
-          </P>
-
-          <Pressable
-            onPress={() => setOpenInfo(false)}
-            style={{
-              padding: 12,
-              alignItems: "center",
-              marginTop: 12,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: outline,
-            }}
-          >
-            <P style={{ color: text, fontFamily: "WorkSans_600SemiBold" }}>
-              Close
-            </P>
-          </Pressable>
-        </View>
-      </Modal>
+      <BottomSheet
+        open={openInfo}
+        onClose={() => setOpenInfo(false)}
+        title="Tempo guide"
+        infoText={infoText}
+      />
     </Field>
   );
 };

@@ -5,7 +5,7 @@ import { SetTypePill } from "@/components/ui/workout/SeriesBuilder/components/Se
 import type { SetType } from "@/entities/program/types";
 import type { Exercise } from "@/entities/program/zod";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { Hourglass, Lightbulb, Timer } from "lucide-react-native";
+import { Hourglass, Lightbulb, Target, Timer } from "lucide-react-native"; // 👈 added Target
 import React from "react";
 import { Image, Pressable, View } from "react-native";
 
@@ -21,20 +21,22 @@ export const ExerciseItem: React.FC<{
   const surfaceElevated = useThemeColor({}, "surfaceElevated");
   const tint = useThemeColor({}, "tint");
   const primary = useThemeColor({}, "primary");
-  const icon = useThemeColor({}, "icon"); // for icons
+  const icon = useThemeColor({}, "icon");
+
   const noteText = (exercise.trainerNote || "").trim();
-  const [noteOpen, setNoteOpen] = React.useState(false);
   const sets = exercise.sets ?? [];
   const tempoString = (exercise.tempo ?? []).join("/");
 
+  const [noteOpen, setNoteOpen] = React.useState(false);
   const [tempoOpen, setTempoOpen] = React.useState(false);
   const [imgOpen, setImgOpen] = React.useState(false);
+  const [targetsOpen, setTargetsOpen] = React.useState(false); // 👈 new
 
   const thumbSize = 48;
 
   return (
     <View style={{ gap: 10 }}>
-      {/* Header row — subtle emphasis (no loud tint): elevated bg + tint border chip */}
+      {/* Header */}
       <View style={{ flexDirection: "row", gap: 8 }}>
         <View
           style={{
@@ -49,7 +51,7 @@ export const ExerciseItem: React.FC<{
             flex: 1,
           }}
         >
-          {/* Code chip with subtle accent */}
+          {/* Code chip */}
           <View
             style={{
               minWidth: 36,
@@ -77,7 +79,7 @@ export const ExerciseItem: React.FC<{
             </P>
           </View>
 
-          {/* Thumbnail (opens preview, not editable here) */}
+          {/* Thumbnail */}
           <Pressable
             onPress={() => setImgOpen(true)}
             style={{
@@ -99,6 +101,25 @@ export const ExerciseItem: React.FC<{
             ) : null}
           </Pressable>
         </View>
+
+        {/* 👇 ALWAYS show Target button (like the lightbulb style) */}
+        <Pressable
+          onPress={() => setTargetsOpen(true)}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            paddingVertical: 4,
+            borderWidth: 1,
+            borderColor: outline,
+            borderRadius: 50,
+            padding: 8,
+          }}
+        >
+          <Target size={20} color={icon} />
+        </Pressable>
+
+        {/* Note button (only if note exists) */}
         {noteText ? (
           <Pressable
             onPress={() => setNoteOpen(true)}
@@ -117,9 +138,9 @@ export const ExerciseItem: React.FC<{
           </Pressable>
         ) : null}
       </View>
-      {/* Space before sets so header never touches following content */}
+
+      {/* Sets */}
       <View style={{ paddingTop: 6, gap: 8 }}>
-        {/* Vertical sets: compact row with balanced spacing (no wasted right space) */}
         {sets.length === 0 ? (
           <P style={{ color: muted, fontSize: 12 }}>No sets.</P>
         ) : (
@@ -138,15 +159,10 @@ export const ExerciseItem: React.FC<{
                 gap: 10,
               }}
             >
-              {/* type icon (info mode) */}
               <SetTypePill value={st.type as SetType} mode="info" />
-
-              {/* reps (takes available space) */}
               <P style={{ color: text, fontWeight: "600", flexShrink: 1 }}>
                 Reps {st.reps}
               </P>
-
-              {/* right-side rest (tight, no extra whitespace) */}
               <View
                 style={{
                   marginLeft: "auto",
@@ -163,7 +179,7 @@ export const ExerciseItem: React.FC<{
         )}
       </View>
 
-      {/* Tempo row + unified bottom sheet */}
+      {/* Tempo row */}
       <View
         style={{
           flexDirection: "row",
@@ -202,6 +218,7 @@ export const ExerciseItem: React.FC<{
         </P>
       </View>
 
+      {/* Sheets */}
       <BottomSheet
         open={tempoOpen}
         onClose={() => setTempoOpen(false)}
@@ -211,6 +228,37 @@ export const ExerciseItem: React.FC<{
           "Use numbers in seconds (e.g., 3/0/1/0). X is for explosiveness (≈ 0s)."
         }
       />
+
+      {/* 👇 Targets sheet with chips (read-only display) */}
+      <BottomSheet
+        open={targetsOpen}
+        onClose={() => setTargetsOpen(false)}
+        title="Target muscles"
+      >
+        <View style={{ paddingHorizontal: 8, paddingVertical: 6 }}>
+          {exercise.targetMuscles?.length ? (
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+              {exercise.targetMuscles.map((t) => (
+                <View
+                  key={t}
+                  style={{
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: outline,
+                    backgroundColor: tint,
+                  }}
+                >
+                  <P style={{ color: "#fff", fontSize: 12 }}>{t}</P>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <P style={{ color: muted, fontSize: 12 }}>No targets selected.</P>
+          )}
+        </View>
+      </BottomSheet>
 
       <ImagePreviewModal
         visible={imgOpen}

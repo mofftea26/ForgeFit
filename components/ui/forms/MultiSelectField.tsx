@@ -43,8 +43,9 @@ export function MultiSelectField<T extends string | number>({
   const muted = useThemeColor({}, "muted");
   const tint = useThemeColor({}, "primarySoft");
   const sheetBg = useThemeColor({}, "background");
+  const primarySoft = useThemeColor({}, "primarySoft");
   const insets = useSafeAreaInsets();
-  const safeBottom = Math.max(insets.bottom, 12);
+  const safeBottom = Math.max(insets.bottom - 40, 12);
   const selectedLabels = useMemo(
     () =>
       options
@@ -92,7 +93,12 @@ export function MultiSelectField<T extends string | number>({
         </P>
       </Pressable>
 
-      <Modal visible={open} animationType="slide" transparent>
+      <Modal
+        visible={open}
+        animationType="slide"
+        transparent
+        style={{ borderRadius: 16 }}
+      >
         <Pressable
           onPress={() => setOpen(false)}
           style={{ flex: 1, backgroundColor: "#0007" }}
@@ -104,13 +110,15 @@ export function MultiSelectField<T extends string | number>({
             borderTopLeftRadius: 16,
             borderTopRightRadius: 16,
             padding: 12,
+            borderWidth: 1,
+            borderColor: outline,
           }}
         >
           <View
             style={{
               height: 4,
               width: 40,
-              backgroundColor: outline,
+              backgroundColor: primarySoft,
               borderRadius: 4,
               alignSelf: "center",
               marginBottom: 12,
@@ -124,10 +132,9 @@ export function MultiSelectField<T extends string | number>({
               onChangeText={setQ}
               style={{
                 borderColor: outline,
-                borderWidth: 1,
+                borderWidth: 0,
                 borderRadius: 12,
-                paddingHorizontal: 12,
-                paddingVertical: 10,
+
                 marginBottom: 8,
                 color: text,
                 fontFamily: "WorkSans_400Regular",

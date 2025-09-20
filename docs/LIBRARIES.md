@@ -14,7 +14,6 @@
 
 ### UI
 
-- **@gorhom/bottom-sheet** `^5.2.6`
 - **lucide-react-native** `^0.544.0`
 - **@expo/vector-icons** `^15.0.2`
 - **expo-linear-gradient** `~15.0.7`

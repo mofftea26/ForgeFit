@@ -34,6 +34,7 @@ export const ExerciseCard: React.FC<Props> = ({
   const muted = useThemeColor({}, "muted");
   const primarySoft = useThemeColor({}, "primarySoft");
   const outline = useThemeColor({}, "outline");
+  const hasNote = !!value.trainerNote?.trim();
 
   const {
     noteOpen,
@@ -76,8 +77,39 @@ export const ExerciseCard: React.FC<Props> = ({
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
           <P style={{ color: text, fontWeight: "700", fontSize: 13 }}>{code}</P>
-          <Pressable onPress={() => setNoteOpen(true)} hitSlop={8}>
-            <Lightbulb size={16} color={muted} />
+          <Pressable
+            onPress={() => setNoteOpen(true)}
+            hitSlop={8}
+            style={{ position: "relative" }}
+          >
+            <Lightbulb
+              size={16}
+              color={hasNote ? primarySoft : muted}
+              // Optional: a subtle "glow" effect when note exists
+              style={
+                hasNote
+                  ? {
+                      shadowColor: primarySoft,
+                      shadowOpacity: 0.6,
+                      shadowRadius: 6,
+                    }
+                  : undefined
+              }
+            />
+            {/* Optional tiny dot badge when note exists */}
+            {hasNote && (
+              <View
+                style={{
+                  position: "absolute",
+                  right: -2,
+                  top: -2,
+                  width: 6,
+                  height: 6,
+                  borderRadius: 3,
+                  backgroundColor: primarySoft,
+                }}
+              />
+            )}
           </Pressable>
         </View>
         <View style={{ flex: 1 }} />
@@ -157,7 +189,9 @@ export const ExerciseCard: React.FC<Props> = ({
       </View>
 
       {!!value.trainerNote && (
-        <P style={{ color: muted, fontSize: 12 }}>Note: {value.trainerNote}</P>
+        <P style={{ color: muted, fontSize: 12 }}>
+          {hasNote ? "Note:" : "Trainer note:"} {value.trainerNote}
+        </P>
       )}
 
       {/* Note modal */}

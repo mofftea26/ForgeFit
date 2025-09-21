@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -26,6 +25,10 @@ import { useProgramStore } from "@/stores";
 import { InfoRow } from "./components/InfoRow";
 import { Stepper } from "./components/Stepper";
 
+import { useImagePicker } from "@/components/ui/workout/SeriesBuilder/hooks/useImagePicker"; // your existing hook
+import { CreateProgramFormValues } from "@/features/Create/Schema/createProgramForm";
+import { useCreateProgramForm } from "./hooks/useCreateProgramForm";
+
 export function CreateProgramScreen() {
   const bg = useThemeColor({}, "background");
   const outline = useThemeColor({}, "outline");
@@ -37,52 +40,36 @@ export function CreateProgramScreen() {
   const addProgram = useProgramStore((s) => s.addProgram);
   const updateProgram = useProgramStore((s) => s.updateProgram);
 
+  // multi-step UI state (unchanged)
   const [step, setStep] = React.useState(0);
   const stepsTotal = 3;
 
-  const [title, setTitle] = React.useState("");
-  const [goal, setGoal] = React.useState<
-    "cut" | "bulk" | "recomp" | "strength" | "endurance"
-  >("cut");
-  const [weeks, setWeeks] = React.useState(4);
-  const [description, setDescription] = React.useState("");
-  const [imageUri, setImageUri] = React.useState<string | undefined>(undefined);
+  const { pickImage } = useImagePicker();
 
-  const canNext = () =>
-    step === 0 ? title.trim().length > 0 && weeks > 0 : true;
-
-  const onNext = () => {
-    if (step < stepsTotal - 1) {
-      setStep((s) => s + 1);
-    } else {
-      const p = addProgram(title || "Untitled");
-      updateProgram(p.id, {
-        goal,
-        lengthWeeks: weeks,
-        description,
-        imageUrl: imageUri,
-      });
-      router.replace(`/programs/${p.id}/edit`);
-    }
-  };
-
-  const onBack = () => {
-    if (step === 0) {
-      router.back();
-      return;
-    }
-    setStep((s) => Math.max(0, s - 1));
-  };
-
-  async function pickImage() {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") return;
-    const res = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.85,
+  const onFinish = (values: CreateProgramFormValues) => {
+    const p = addProgram(values.title || "Untitled");
+    updateProgram(p.id, {
+      goal: values.goal,
+      lengthWeeks: values.lengthWeeks,
+      description: values.description ?? "",
+      imageUrl: values.imageUrl,
     });
-    if (!res.canceled && res.assets?.[0]?.uri) setImageUri(res.assets[0].uri);
-  }
+    router.replace(`/programs/${p.id}/edit`);
+  };
+
+  const { formik, canProceedBasics } = useCreateProgramForm({ onFinish });
+
+  const goNext = () => {
+    if (step < stepsTotal - 1) setStep((s) => s + 1);
+    else formik.handleSubmit(); // Finish
+  };
+  const goBack = () => {
+    if (step === 0) router.back();
+    else setStep((s) => Math.max(0, s - 1));
+  };
+
+  // identical gate as before (title non-empty + weeks > 0)
+  const nextDisabled = step === 0 ? !canProceedBasics : false;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bg }}>
@@ -103,10 +90,12 @@ export function CreateProgramScreen() {
 
             <TextField
               label="Title"
-              value={title}
-              onChangeText={setTitle}
+              value={formik.values.title}
+              onChangeText={(t) => formik.setFieldValue("title", t)}
+              onBlur={() => formik.setFieldTouched("title", true)}
               required
             />
+
             <SelectField
               label="Goal"
               options={[
@@ -116,19 +105,20 @@ export function CreateProgramScreen() {
                 { label: "Strength", value: "strength" },
                 { label: "Endurance", value: "endurance" },
               ]}
-              value={goal}
-              onChange={setGoal}
+              value={formik.values.goal}
+              onChange={(v) => formik.setFieldValue("goal", v)}
             />
+
             <NumberInput
               label="Length (weeks)"
-              value={weeks}
-              onChange={(v) => setWeeks(v ?? 0)}
+              value={formik.values.lengthWeeks}
+              onChange={(v) => formik.setFieldValue("lengthWeeks", v ?? 0)}
             />
 
             <TextArea
               label="Description"
-              value={description}
-              onChangeText={setDescription}
+              value={formik.values.description ?? ""}
+              onChangeText={(t) => formik.setFieldValue("description", t)}
               placeholder="What this program is about…"
               multiline
               style={{ minHeight: 140, textAlignVertical: "top" }}
@@ -144,7 +134,10 @@ export function CreateProgramScreen() {
           <H2>Cover image</H2>
           <View style={{ height: 12 }} />
           <Pressable
-            onPress={pickImage}
+            onPress={async () => {
+              const uri = await pickImage();
+              if (uri) formik.setFieldValue("imageUrl", uri);
+            }}
             style={{
               width: "100%",
               height: 220,
@@ -157,9 +150,9 @@ export function CreateProgramScreen() {
               overflow: "hidden",
             }}
           >
-            {imageUri ? (
+            {formik.values.imageUrl ? (
               <Image
-                source={{ uri: imageUri }}
+                source={{ uri: formik.values.imageUrl }}
                 style={{ width: "100%", height: "100%" }}
                 resizeMode="cover"
               />
@@ -193,7 +186,7 @@ export function CreateProgramScreen() {
           <H2>Review</H2>
           <View style={{ height: 12 }} />
 
-          {imageUri ? (
+          {formik.values.imageUrl ? (
             <View
               style={{
                 borderWidth: 1,
@@ -204,17 +197,22 @@ export function CreateProgramScreen() {
               }}
             >
               <Image
-                source={{ uri: imageUri }}
+                source={{ uri: formik.values.imageUrl }}
                 style={{ width: "100%", height: 140 }}
                 resizeMode="cover"
               />
             </View>
           ) : null}
 
-          <InfoRow label="Title" value={title || "Untitled"} />
-          <InfoRow label="Goal" value={goal} />
-          <InfoRow label="Length" value={`${weeks} weeks`} />
-          {!!description && <InfoRow label="Description" value={description} />}
+          <InfoRow label="Title" value={formik.values.title || "Untitled"} />
+          <InfoRow label="Goal" value={formik.values.goal} />
+          <InfoRow
+            label="Length"
+            value={`${formik.values.lengthWeeks} weeks`}
+          />
+          {!!formik.values.description && (
+            <InfoRow label="Description" value={formik.values.description} />
+          )}
 
           <View style={{ height: 8 }} />
           <P color="muted">
@@ -233,14 +231,14 @@ export function CreateProgramScreen() {
         }}
       >
         <View style={{ flex: 1 }}>
-          <Button title="Back" variant="ghost" onPress={onBack} fullWidth />
+          <Button title="Back" variant="ghost" onPress={goBack} fullWidth />
         </View>
         <View style={{ flex: 1 }}>
           <Button
             title={step < stepsTotal - 1 ? "Next" : "Finish"}
             variant="primary"
-            onPress={onNext}
-            disabled={!canNext()}
+            onPress={goNext}
+            disabled={nextDisabled}
             fullWidth
           />
         </View>

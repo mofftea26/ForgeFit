@@ -72,7 +72,6 @@ export const Button: React.FC<ButtonProps> = ({
   const cAccentAlt = useThemeColor({}, "accentAlt");
   const cSurface = useThemeColor({}, "surface");
   const cOutline = useThemeColor({}, "outline");
-  const cMuted = useThemeColor({}, "muted");
 
   // sizing
   const PAD_Y = { sm: 8, md: 11, lg: 14 }[size];

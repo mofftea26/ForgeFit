@@ -1,4 +1,3 @@
-// workout/SeriesBuilder/components/ExerciseCard.tsx
 import { ImagePreviewModal } from "@/components/media/ImagePreviewModal";
 import { P } from "@/components/ui/Typography";
 import { TempoInputs } from "@/components/ui/forms/Tempo";

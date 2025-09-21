@@ -180,3 +180,5 @@ export const blankProgram = (title = "New Program"): Program => ({
   createdAt: Date.now(),
   updatedAt: Date.now(),
 });
+
+export type ProgramGoal = z.infer<typeof programSchema.shape.goal>;

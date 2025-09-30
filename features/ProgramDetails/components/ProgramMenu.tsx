@@ -37,7 +37,13 @@ export function ProgramMenu({ program, onClose }: Props) {
           router.push(`/programs/${program.id}/edit`);
         }}
       />
-      <MenuItem label="Export (soon)" onPress={onClose} />
+      <MenuItem
+        label="Export PDF"
+        onPress={() => {
+          onClose();
+          router.push(`/programs/${program.id}/export-pdf`);
+        }}
+      />
       <MenuItem label="Share as… (soon)" onPress={onClose} />
       <MenuItem
         label="Delete program"

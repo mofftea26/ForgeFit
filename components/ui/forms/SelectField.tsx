@@ -1,7 +1,6 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React, { useMemo, useState } from "react";
 import { FlatList, Platform, Pressable, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BottomSheet } from "../BottomSheet";
 import { P } from "../Typography";
 import { Field, FieldProps } from "./Field";
@@ -43,9 +42,6 @@ export function SelectField<T extends string | number>({
   const outline = useThemeColor({}, "outline");
   const muted = useThemeColor({}, "muted");
   const tint = useThemeColor({}, "primarySoft");
-  const sheetBg = useThemeColor({}, "background");
-  const insets = useSafeAreaInsets();
-  const safeBottom = Math.max(insets.bottom, 12);
   const selected = options.find((o) => o.value === value);
 
   const filtered = useMemo(() => {

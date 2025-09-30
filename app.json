@@ -13,7 +13,6 @@
       "resizeMode": "contain",
       "backgroundColor": "#0B1420"
     },
-
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.dancho26.forgefit",
@@ -56,7 +55,8 @@
             "backgroundColor": "#0B1420"
           }
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true,

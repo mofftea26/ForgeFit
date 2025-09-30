@@ -22,14 +22,11 @@ import { useClampedPhaseIndex } from "./hooks/useClampedPhaseIndex";
 export function ProgramDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const bg = useThemeColor({}, "background");
-  const text = useThemeColor({}, "text");
   const surface = useThemeColor({}, "surface");
   const outline = useThemeColor({}, "outline");
   const router = useRouter();
 
   const program = useProgramStore((s) => s.programs.find((p) => p.id === id));
-  const update = useProgramStore((s) => s.updateProgram);
-  const removeProgram = useProgramStore((s) => s.removeProgram);
 
   const [phaseIdx, setPhaseIdx] = React.useState(0);
   const [menuOpen, setMenuOpen] = React.useState(false);

@@ -1,4 +1,4 @@
-import * as FileSystem from "expo-file-system/legacy";
+import { Directory, File, Paths } from "expo-file-system";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { CoverOptions, buildProgramHtml } from "../htmlBuilder";
@@ -34,23 +34,31 @@ export async function exportProgramPdf(
 
   const html = buildProgramHtml(printableWithImages, iconDataUrl, cover);
 
+  // 1) Create the PDF to a tmp file (cache)
   const { uri: tmpUri } = await Print.printToFileAsync({ html });
 
-  const dir = FileSystem.documentDirectory ?? FileSystem.cacheDirectory ?? null;
-  if (!dir)
-    return { fileUri: tmpUri, canShare: await Sharing.isAvailableAsync() };
+  // 2) Pick a safe output directory (prefer Documents, fall back to Cache)
+  const documents = Paths.document; // Directory
+  const cache = Paths.cache; // Directory
+  const baseDir: Directory = documents ?? cache;
 
   const title = (printable.title || "Program").replace(/[^\w\-]+/g, "_");
   const date = new Date().toISOString().split("T")[0];
-  const outPath = `${dir}${title}_${date}.pdf`;
+  const outFile = new File(baseDir, `${title}_${date}.pdf`);
 
   try {
-    const info = await FileSystem.getInfoAsync(outPath);
-    if (info.exists)
-      await FileSystem.deleteAsync(outPath, { idempotent: true });
-    await FileSystem.moveAsync({ from: tmpUri, to: outPath });
-    return { fileUri: outPath, canShare: await Sharing.isAvailableAsync() };
+    // If a file with the same name exists, delete it first
+    if (outFile.exists) {
+      outFile.delete();
+    }
+
+    // Move tmp -> final location
+    const tmpFile = new File(tmpUri);
+    tmpFile.move(outFile); // you can also pass baseDir to move into a dir and then rename
+
+    return { fileUri: outFile.uri, canShare: await Sharing.isAvailableAsync() };
   } catch {
+    // If anything fails, just share the tmp file
     return { fileUri: tmpUri, canShare: await Sharing.isAvailableAsync() };
   }
 }

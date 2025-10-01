@@ -1,5 +1,6 @@
 import * as React from "react";
 import { CoverOptions, buildProgramHtml } from "../htmlBuilder";
+import { INSTRUCTIONS } from "../htmlBuilder/appendix/instructionsData";
 import { applyScreenPaging } from "../utils/applyScreenPaging";
 import { getAppIconDataUrl } from "../utils/getAppIconDataUrl";
 import { inlineImages } from "../utils/inlineImages";
@@ -39,7 +40,10 @@ export function useBuildProgramHtml({
         dateMs,
       };
 
-      const raw = buildProgramHtml(withImages, iconDataUrl, cover);
+      const raw = buildProgramHtml(withImages, iconDataUrl, cover, {
+        showGeneralInfo: true,
+        instructions: INSTRUCTIONS,
+      });
       const paged = applyScreenPaging(raw);
       setHtml(paged);
     } catch (e) {

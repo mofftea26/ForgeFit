@@ -28,7 +28,7 @@ export function ProgramPdfPreview({
   style,
 }: Props) {
   const [clientName, setClientName] = React.useState(clientNameProp || "");
-  const [shareLoading, setShareLoading] = React.useState(false); // ← NEW
+  const [shareLoading, setShareLoading] = React.useState(false);
 
   const { programs, selectedId, setSelectedId, currentProgram } =
     useProgramSelection(programId);
@@ -50,9 +50,8 @@ export function ProgramPdfPreview({
 
   const { webViewHeight, onMessage, injectedJavaScript } = useWebviewHeight();
 
-  // Wrap sharing with a loading guard
   const onShare = React.useCallback(async () => {
-    if (shareLoading) return; // guard
+    if (shareLoading) return;
     setShareLoading(true);
     try {
       await handleShare();
@@ -67,8 +66,8 @@ export function ProgramPdfPreview({
         clientName={clientName}
         onClientNameChange={setClientName}
         onRefresh={buildHtml}
-        onShare={onShare} // ← wrapped with loading
-        shareLoading={shareLoading} // ← NEW
+        onShare={onShare}
+        shareLoading={shareLoading}
       >
         <ProgramSelect
           programs={programs}

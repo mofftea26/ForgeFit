@@ -1,4 +1,4 @@
-import { Directory, File, Paths } from "expo-file-system";
+import { File, Paths } from "expo-file-system";
 
 function inferMimeFromPath(p: string) {
   const q = p.split("?")[0].toLowerCase();
@@ -18,24 +18,14 @@ export async function toDataUrl(
   try {
     let localUri = src;
 
-    // If remote, download to cache using the modern API
     if (src.startsWith("http://") || src.startsWith("https://")) {
-      const cacheDir = Paths.cache; // Directory
-      cacheDir.create(); // idempotent – will throw only if not permitted
+      const cacheDir = Paths.cache;
+      cacheDir.create();
+      const downloaded = await File.downloadFileAsync(src, cacheDir);
 
-      // Use a short, safe filename
-      const filename = encodeURIComponent(src).slice(0, 80);
-      const downloaded = await File.downloadFileAsync(
-        src,
-        new Directory(cacheDir, "")
-      ); // to cache root
-      // If you need a specific filename:
-      // const out = new File(cacheDir, filename);
-      // downloaded.move(out);
       localUri = downloaded.uri;
     }
 
-    // Read as base64 via File
     const b64 = await new File(localUri).base64();
 
     const mime = inferMimeFromPath(src);

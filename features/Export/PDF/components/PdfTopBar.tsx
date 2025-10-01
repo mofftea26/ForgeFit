@@ -77,14 +77,14 @@ export function PdfTopBar({
 
         <Pressable
           onPress={onShare}
-          disabled={shareLoading} // ← NEW
+          disabled={shareLoading}
           style={{
             padding: 8,
             borderRadius: 8,
             backgroundColor: "#122133",
             borderWidth: 1,
             borderColor: "#132233",
-            opacity: shareLoading ? 0.6 : 1, // ← subtle disabled look
+            opacity: shareLoading ? 0.6 : 1,
           }}
         >
           {shareLoading ? (

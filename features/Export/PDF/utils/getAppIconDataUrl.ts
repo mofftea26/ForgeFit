@@ -1,16 +1,16 @@
 import { Asset } from "expo-asset";
-import * as FileSystem from "expo-file-system/legacy";
+import { File } from "expo-file-system";
 
 export async function getAppIconDataUrl(iconModule: any) {
   const asset = Asset.fromModule(iconModule);
   if (!asset.localUri) {
-    await asset.downloadAsync();
+    await asset.downloadAsync(); // ensures localUri is set
   }
   const uri = asset.localUri || asset.uri;
 
-  const b64 = await FileSystem.readAsStringAsync(uri, {
-    encoding: "base64",
-  });
+  // Modern API: read file as base64 directly from File
+  const b64 = await new File(uri).base64();
+
   const mime =
     uri.endsWith(".jpg") || uri.endsWith(".jpeg") ? "image/jpeg" : "image/png";
   return `data:${mime};base64,${b64}`;

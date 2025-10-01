@@ -4,11 +4,10 @@ import { File } from "expo-file-system";
 export async function getAppIconDataUrl(iconModule: any) {
   const asset = Asset.fromModule(iconModule);
   if (!asset.localUri) {
-    await asset.downloadAsync(); // ensures localUri is set
+    await asset.downloadAsync();
   }
   const uri = asset.localUri || asset.uri;
 
-  // Modern API: read file as base64 directly from File
   const b64 = await new File(uri).base64();
 
   const mime =

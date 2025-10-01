@@ -24,20 +24,27 @@ export function useShareProgramPdf({
     if (!selectedId) return;
     try {
       const prog = programs.find((p) => p.id === selectedId);
-      const printable = prog ? toPrintableProgram(prog) : undefined;
-      const raw = printable ? getProgramImageUrl(printable) : undefined;
+      if (!prog) return;
+
+      const printable = toPrintableProgram(prog);
+      const raw = getProgramImageUrl(printable);
       const dataUrl = raw ? await toDataUrl(raw) : undefined;
 
-      const res = await exportProgramPdf(selectedId, {
-        clientName: clientName?.trim() || undefined,
-        programImage: dataUrl,
-        details,
-        dateMs,
-      });
+      const res = await exportProgramPdf(
+        { printable },
+        {
+          clientName: clientName?.trim() || undefined,
+          programImage: dataUrl,
+          details,
+          dateMs,
+        }
+      );
 
       if (res.canShare) {
         await Sharing.shareAsync(res.fileUri, {
           dialogTitle: "Share Program PDF",
+          UTI: "com.adobe.pdf",
+          mimeType: "application/pdf",
         });
       } else {
         console.log("Sharing not available; file saved at:", res.fileUri);

@@ -1,28 +1,29 @@
-import { Directory, File, Paths } from "expo-file-system";
+import { File, Paths } from "expo-file-system";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { CoverOptions, buildProgramHtml } from "../htmlBuilder";
+import { INSTRUCTIONS } from "../htmlBuilder/appendix/instructionsData";
 import { getAppIconDataUrl } from "./getAppIconDataUrl";
 import { inlineImages } from "./inlineImages";
-import { getProgramById, toPrintableProgram } from "./selectors";
+import { toPrintableProgram } from "./selectors";
 
-export async function exportProgramPdf(
-  programId: string,
-  opts?: {
-    clientName?: string;
-    programImage?: string;
-    details?: CoverOptions["details"];
-    dateMs?: number;
-  }
-) {
-  const prog = getProgramById(programId);
-  if (!prog) throw new Error("Program not found.");
+type ExportSource =
+  | { program: any }
+  | { printable: ReturnType<typeof toPrintableProgram> };
 
-  const printable = toPrintableProgram(prog);
+type ExportOpts = {
+  clientName?: string;
+  programImage?: string;
+  details?: CoverOptions["details"];
+  dateMs?: number;
+};
+
+export async function exportProgramPdf(src: ExportSource, opts?: ExportOpts) {
+  const printable =
+    "printable" in src ? src.printable : toPrintableProgram(src.program);
 
   const iconModule = require("@/assets/images/pngTitle/logo-color.png");
   const iconDataUrl = await getAppIconDataUrl(iconModule);
-
   const printableWithImages = await inlineImages(printable, iconDataUrl);
 
   const cover: CoverOptions = {
@@ -32,33 +33,21 @@ export async function exportProgramPdf(
     dateMs: opts?.dateMs,
   };
 
-  const html = buildProgramHtml(printableWithImages, iconDataUrl, cover);
+  const html = buildProgramHtml(printableWithImages, iconDataUrl, cover, {
+    showGeneralInfo: true,
+    instructions: INSTRUCTIONS,
+  });
 
-  // 1) Create the PDF to a tmp file (cache)
   const { uri: tmpUri } = await Print.printToFileAsync({ html });
 
-  // 2) Pick a safe output directory (prefer Documents, fall back to Cache)
-  const documents = Paths.document; // Directory
-  const cache = Paths.cache; // Directory
-  const baseDir: Directory = documents ?? cache;
-
-  const title = (printable.title || "Program").replace(/[^\w\-]+/g, "_");
-  const date = new Date().toISOString().split("T")[0];
-  const outFile = new File(baseDir, `${title}_${date}.pdf`);
-
   try {
-    // If a file with the same name exists, delete it first
-    if (outFile.exists) {
-      outFile.delete();
-    }
-
-    // Move tmp -> final location
-    const tmpFile = new File(tmpUri);
-    tmpFile.move(outFile); // you can also pass baseDir to move into a dir and then rename
-
-    return { fileUri: outFile.uri, canShare: await Sharing.isAvailableAsync() };
+    const title = (printable.title || "Program").replace(/[^\w\-]+/g, "_");
+    const date = new Date().toISOString().split("T")[0];
+    const out = new File(Paths.document, `${title}_${date}.pdf`);
+    if (out.exists) out.delete();
+    new File(tmpUri).move(out);
+    return { fileUri: out.uri, canShare: await Sharing.isAvailableAsync() };
   } catch {
-    // If anything fails, just share the tmp file
     return { fileUri: tmpUri, canShare: await Sharing.isAvailableAsync() };
   }
 }

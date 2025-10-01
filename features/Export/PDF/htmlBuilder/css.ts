@@ -37,6 +37,7 @@ h3 { font-size: 14px; }
 .muted  { color: ${C.muted}; }
 .small  { font-size: 11px; }
 .primary{ color: ${Colors.light.primary}; }
+.soft   { color: ${Colors.light.primarySoft}; }
 .code   { font-family: ${FMONO}; }
 
 /* =========================================================
@@ -64,13 +65,45 @@ footer.pdf-footer,
    --------------------------------------------------------- */
 /* Cover is its own page; content pages flow normally (no extra padding here—
    @page handles margins on every page). */
-main.cover-page { padding: 0; min-height: 100vh; page-break-after: always; }
-main.pages      { padding: 0; }
+main.cover-page { padding: 0; min-height: 100vh; page-break-after: always;padding:10px; background: ${C.surface}; border-radius: 10px; }
+main.pages      { padding:10px; background: ${C.surface}; border-radius: 10px;}
 
 /* Prevent unwanted gap before first phase */
 main.pages > .phase:first-child {
   margin-top: 0 !important;
   page-break-before: auto !important;
+}
+
+/* =========================================================
+   A) APPENDIX PAGES
+   --------------------------------------------------------- */
+.page { page-break-before: always; break-before: page; }
+
+/* A full “page” block; each appendix section starts on a new printed page */
+.appendix.page {
+  page-break-before: always;
+  break-before: page;
+  margin-top: 14px;
+}
+
+.appendix-header { margin-bottom: 8px; }
+.appendix-title  { font-size: 22px; font-weight: 900; letter-spacing: .2px; }
+.note-strong { font-weight: 700; }
+/* Cards inside appendix */
+.appendix-card + .appendix-card { margin-top: 10px; }
+
+/* Simple lists */
+ul.bullet { margin: 6px 0 0 18px; padding: 0; }
+ul.bullet li { margin: 4px 0; }
+
+ol.numbered { margin: 6px 0 0 18px; padding: 0; }
+ol.numbered li { margin: 4px 0; }
+
+/* Handy grid for little fact blocks */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
 }
 
 /* =========================================================

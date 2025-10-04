@@ -1,4 +1,4 @@
-import { File, Paths } from "expo-file-system";
+import * as FS from "expo-file-system";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { CoverOptions, buildProgramHtml } from "../htmlBuilder";
@@ -43,9 +43,11 @@ export async function exportProgramPdf(src: ExportSource, opts?: ExportOpts) {
   try {
     const title = (printable.title || "Program").replace(/[^\w\-]+/g, "_");
     const date = new Date().toISOString().split("T")[0];
-    const out = new File(Paths.document, `${title}_${date}.pdf`);
+
+    const out = new FS.File(FS.Paths.document, `${title}_${date}.pdf`);
     if (out.exists) out.delete();
-    new File(tmpUri).move(out);
+    new FS.File(tmpUri).move(out);
+
     return { fileUri: out.uri, canShare: await Sharing.isAvailableAsync() };
   } catch {
     return { fileUri: tmpUri, canShare: await Sharing.isAvailableAsync() };

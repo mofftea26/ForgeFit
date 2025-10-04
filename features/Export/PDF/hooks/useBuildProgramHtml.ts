@@ -26,12 +26,25 @@ export function useBuildProgramHtml({
       setHtml("<html><body><h3>No program found</h3></body></html>");
       return;
     }
-    try {
-      const iconModule = require("@/assets/images/pngTitle/logo-color.png");
-      const iconDataUrl = await getAppIconDataUrl(iconModule);
 
+    try {
+      let iconDataUrl = "";
+      try {
+        iconDataUrl = await getAppIconDataUrl();
+      } catch {
+        iconDataUrl =
+          "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWP4////GwAFgwJ/1n0iLQAAAABJRU5ErkJggg==";
+      }
+
+      // --- 2) Build printable model ---
       const printable = toPrintableProgram(currentProgram);
-      const withImages = await inlineImages(printable, iconDataUrl);
+
+      let withImages = printable as any;
+      try {
+        withImages = await inlineImages(printable, iconDataUrl);
+      } catch {
+        withImages = printable;
+      }
 
       const cover: CoverOptions = {
         clientName: clientName?.trim() || undefined,
@@ -48,7 +61,9 @@ export function useBuildProgramHtml({
       setHtml(paged);
     } catch (e) {
       console.warn("Build HTML failed", e);
-      setHtml("<html><body><h3>Failed to build preview</h3></body></html>");
+      setHtml(
+        "<html><body><h3>Failed to build preview</h3><p>Try again.</p></body></html>"
+      );
     }
   }, [currentProgram, clientName, details, dateMs]);
 

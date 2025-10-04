@@ -1,4 +1,4 @@
-import { File, Paths } from "expo-file-system";
+import * as FS from "expo-file-system";
 
 function inferMimeFromPath(p: string) {
   const q = p.split("?")[0].toLowerCase();
@@ -19,15 +19,12 @@ export async function toDataUrl(
     let localUri = src;
 
     if (src.startsWith("http://") || src.startsWith("https://")) {
-      const cacheDir = Paths.cache;
-      cacheDir.create();
-      const downloaded = await File.downloadFileAsync(src, cacheDir);
-
-      localUri = downloaded.uri;
+      FS.Paths.cache.create();
+      const { uri } = await FS.File.downloadFileAsync(src, FS.Paths.cache);
+      localUri = uri;
     }
 
-    const b64 = await new File(localUri).base64();
-
+    const b64 = await new FS.File(localUri).base64();
     const mime = inferMimeFromPath(src);
     return `data:${mime};base64,${b64}`;
   } catch {

@@ -18,7 +18,10 @@
       "bundleIdentifier": "com.dancho26.forgefit",
       "buildNumber": "1",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
       },
       "splash": {
         "image": "./assets/images/splash-icon.png",

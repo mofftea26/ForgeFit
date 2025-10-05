@@ -16,6 +16,7 @@ type Props = {
   onRefresh: () => void;
   onShare: () => void;
   shareLoading?: boolean;
+  refreshLoading?: boolean;
   children?: React.ReactNode;
 };
 
@@ -26,6 +27,7 @@ export function PdfTopBar({
   onRefresh,
   onShare,
   shareLoading = false,
+  refreshLoading = false,
   children,
 }: Props) {
   return (
@@ -72,7 +74,11 @@ export function PdfTopBar({
             borderColor: "#132233",
           }}
         >
-          <RefreshCw size={20} color="#ECEDEE" />
+          {refreshLoading ? (
+            <ActivityIndicator size="small" color="#ECEDEE" />
+          ) : (
+            <RefreshCw size={20} color="#ECEDEE" />
+          )}
         </Pressable>
 
         <Pressable

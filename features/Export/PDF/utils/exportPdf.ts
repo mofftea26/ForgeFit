@@ -22,8 +22,7 @@ export async function exportProgramPdf(src: ExportSource, opts?: ExportOpts) {
   const printable =
     "printable" in src ? src.printable : toPrintableProgram(src.program);
 
-  const iconModule = require("@/assets/images/pngTitle/logo-color.png");
-  const iconDataUrl = await getAppIconDataUrl(iconModule);
+  const iconDataUrl = await getAppIconDataUrl();
   const printableWithImages = await inlineImages(printable, iconDataUrl);
 
   const cover: CoverOptions = {

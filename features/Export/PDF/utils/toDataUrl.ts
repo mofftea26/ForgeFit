@@ -1,5 +1,5 @@
 import * as FS from "expo-file-system";
-import * as ImageManipulator from "expo-image-manipulator";
+import { manipulate, SaveFormat } from "expo-image-manipulator";
 
 function inferMimeFromPath(p: string) {
   const q = p.split("?")[0].toLowerCase();
@@ -11,36 +11,26 @@ function inferMimeFromPath(p: string) {
 }
 
 async function resizeToBase64(uri: string): Promise<string | undefined> {
-  try {
-    const hasNewApi =
-      typeof (ImageManipulator as any).manipulate === "function";
+  const mime = inferMimeFromPath(uri);
+  const isPngCandidate =
+    mime === "image/png" &&
+    (!uri.startsWith("http") ||
+      /(?:logo|icon|badge)\b/i.test(uri.split("?")[0]) ||
+      uri.startsWith("asset://"));
 
-    if (hasNewApi) {
-      const result = await (ImageManipulator as any).manipulate(
-        uri,
-        [{ resize: { width: 1600 } }],
-        { compress: 0.9, format: "jpeg", base64: true }
-      );
-      return result?.base64
-        ? `data:image/jpeg;base64,${result.base64}`
-        : undefined;
-    }
+  const targetWidth = 1024;
 
-    const result = await (ImageManipulator as any).manipulateAsync(
-      uri,
-      [{ resize: { width: 1600 } }],
-      {
-        compress: 0.9,
-        format: (ImageManipulator as any).SaveFormat?.JPEG ?? "jpeg",
-        base64: true,
-      }
-    );
-    return result?.base64
-      ? `data:image/jpeg;base64,${result.base64}`
-      : undefined;
-  } catch {
-    return undefined;
-  }
+  const ctx = manipulate(uri);
+  const ref = await ctx
+    .resize({ width: targetWidth, height: null })
+    .renderAsync();
+
+  const format: SaveFormat = isPngCandidate ? "png" : "jpeg";
+  const compress = isPngCandidate ? 1 : 0.82;
+
+  const result = await ref.saveAsync({ base64: true, format, compress });
+  const outMime = format === "png" ? "image/png" : "image/jpeg";
+  return result.base64 ? `data:${outMime};base64,${result.base64}` : undefined;
 }
 
 export async function toDataUrl(
@@ -53,7 +43,7 @@ export async function toDataUrl(
     let localUri = src;
 
     if (src.startsWith("http://") || src.startsWith("https://")) {
-      FS.Paths.cache.create();
+      FS.Paths.cache.create(); // idempotent
       const { uri } = await FS.File.downloadFileAsync(src, FS.Paths.cache);
       localUri = uri;
     }

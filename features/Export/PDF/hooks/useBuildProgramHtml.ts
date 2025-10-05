@@ -36,7 +36,6 @@ export function useBuildProgramHtml({
           "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWP4////GwAFgwJ/1n0iLQAAAABJRU5ErkJggg==";
       }
 
-      // --- 2) Build printable model ---
       const printable = toPrintableProgram(currentProgram);
 
       let withImages = printable as any;

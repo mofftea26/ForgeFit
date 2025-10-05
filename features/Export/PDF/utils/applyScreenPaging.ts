@@ -89,13 +89,25 @@ export function applyScreenPaging(html: string): string {
     }
   };
 
+  const postHeight = (() => {
+    let last = 0;
+    return (extra = 0) => {
+      const h = stack.getBoundingClientRect().height + 80 + extra;
+      // Only post when change is significant (≥12px) to reduce flicker
+      if (Math.abs(h - last) >= 12) {
+        last = h;
+        window.ReactNativeWebView?.postMessage(
+          JSON.stringify({ type: 'height', height: Math.max(600, h) })
+        );
+      }
+    };
+  })();
+
   const paginate = () => {
     stack.innerHTML = '';
     moveChildrenIntoPagedSheets(cover, { isCover: true });
     moveChildrenIntoPagedSheets(pages, { isCover: false });
-
-    const totalHeight = stack.getBoundingClientRect().height + 80;
-    window.ReactNativeWebView?.postMessage(JSON.stringify({ type: 'height', height: Math.max(600, totalHeight) }));
+    postHeight();
   };
 
   const awaitImages = () => {

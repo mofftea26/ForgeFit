@@ -1,4 +1,4 @@
-import "react-native-gesture-handler"; // 👈 must be first
+import "react-native-gesture-handler";
 import "react-native-reanimated";
 
 import { Stack } from "expo-router";

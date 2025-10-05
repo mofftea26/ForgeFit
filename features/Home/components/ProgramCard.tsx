@@ -1,3 +1,4 @@
+import programPlaceholder from "@/assets/images/program-placeholder.webp";
 import { P } from "@/components/ui/Typography";
 import { Program } from "@/entities/program/zod";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -34,7 +35,7 @@ export const ProgramCard: React.FC<{
         source={
           (program as any) && (program as any).imageUrl
             ? { uri: (program as any).imageUrl }
-            : require("@/assets/images/program-placeholder.webp")
+            : programPlaceholder
         }
         style={{ width: "100%", height: 120 }}
         resizeMode="cover"

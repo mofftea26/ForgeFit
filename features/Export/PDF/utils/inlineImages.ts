@@ -1,4 +1,3 @@
-// src/features/export/utils/inlineImages.ts
 import { PrintableProgram } from "./selectors";
 import { toDataUrl } from "./toDataUrl";
 
@@ -13,7 +12,14 @@ export async function inlineImages(
     anyProgram.imageUrl || anyProgram.coverImage || anyProgram.photo || "";
   const coverData = (await toDataUrl(coverRaw)) || iconDataUrl;
   anyProgram.imageUrl = coverData;
-
+  console.log("coverData", coverData);
+  console.log("coverRaw", coverRaw);
+  console.log("iconDataUrl", iconDataUrl);
+  console.log("anyProgram", anyProgram);
+  console.log("clone", clone);
+  console.log("p", p);
+  console.log("iconDataUrl", iconDataUrl);
+  console.log("iconDataUrl", iconDataUrl);
   for (const ph of clone.phases) {
     for (const d of ph.days) {
       if (d.type !== "workout") continue;

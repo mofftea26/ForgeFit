@@ -39,7 +39,9 @@ h3 { font-size: 14px; }
 .primary{ color: ${Colors.light.primary}; }
 .soft   { color: ${Colors.light.primarySoft}; }
 .code   { font-family: ${FMONO}; }
-
+img { max-width: 100%; height: auto; display: block; }
+.ex-thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; }
+.ex-thumb--placeholder { display:flex; align-items:center; justify-content:center; background:#f3f5f7; }
 /* =========================================================
    2) SURFACES & TABLES
    --------------------------------------------------------- */

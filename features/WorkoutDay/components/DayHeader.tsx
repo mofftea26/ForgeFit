@@ -1,3 +1,4 @@
+import programPlaceholder from "@/assets/images/program-placeholder.webp";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
@@ -20,17 +21,12 @@ export const DayHeader: React.FC<Props> = ({
   description,
   onBack,
 }) => {
-  const tintText = "#fff";
   const hasDesc = !!(description && description.length > 0);
 
   return (
     <View style={{ marginBottom: 12 }}>
       <ImageBackground
-        source={
-          imageUri
-            ? { uri: imageUri }
-            : require("@/assets/images/program-placeholder.webp")
-        }
+        source={imageUri ? { uri: imageUri } : programPlaceholder}
         style={{ width: "100%", height: 260, justifyContent: "flex-start" }}
         resizeMode="cover"
       >

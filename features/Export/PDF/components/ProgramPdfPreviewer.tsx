@@ -111,6 +111,8 @@ export function ProgramPdfPreview({
           allowFileAccess
           setSupportMultipleWindows={false}
           mixedContentMode="always"
+          androidLayerType="software"
+          overScrollMode="never"
         />
       </View>
     </SafeAreaView>

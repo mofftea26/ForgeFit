@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import programPlaceholder from "@/assets/images/program-placeholder.webp";
 import { DayCard } from "./components/DayCard";
 import { PhaseSwitcher } from "./components/PhaseSwitcher";
 import { ProgramMenu } from "./components/ProgramMenu";
@@ -60,9 +61,7 @@ export function ProgramDetailsScreen() {
         <View style={{ marginBottom: 12 }}>
           <ImageBackground
             source={
-              program.imageUrl
-                ? { uri: program.imageUrl }
-                : require("@/assets/images/program-placeholder.webp")
+              program.imageUrl ? { uri: program.imageUrl } : programPlaceholder
             }
             style={{ width: "100%", height: 260, justifyContent: "flex-start" }}
             resizeMode="cover"

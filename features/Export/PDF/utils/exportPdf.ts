@@ -48,7 +48,8 @@ export async function exportProgramPdf(src: ExportSource, opts?: ExportOpts) {
     new FS.File(tmpUri).move(out);
 
     return { fileUri: out.uri, canShare: await Sharing.isAvailableAsync() };
-  } catch {
+  } catch (e) {
+    console.error("Error exporting PDF", e);
     return { fileUri: tmpUri, canShare: await Sharing.isAvailableAsync() };
   }
 }
